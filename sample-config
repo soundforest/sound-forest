@@ -1,0 +1,21 @@
+# since we're intending to use bare perl on RPI, let's make config *really*
+# simple
+path_to_chuck=./chuck
+source_files=audio/loops
+
+# determine the maximum number of sounds to play simultaneously
+# note the more sounds the more potential jumbling and more CPU gets used
+concurrent_sounds=2
+
+# fx settings
+fx_chain_enabled=1
+
+# specify the number of effects units in effects chain. Depending on effects
+# chosen, more than two may cause unacceptable performance degradation on
+# a Raspberry pi
+fx_max_concurrent_effects=2
+
+# bufsize is chuck's sample buffer setting. For convenience this can be
+# specified here. Theoretically a higher buffer means smoother playback. YMMV
+bufsize=8192
+srate=32000
