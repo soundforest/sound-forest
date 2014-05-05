@@ -32,7 +32,7 @@ Pan2 outputPan;
 
 // spork ~ panner.initialise(outputPan);
 Fx @ fxChain[ maxConcurrentFx ];
-Fx @ fxBattery[6];
+Fx @ fxBattery[7];
 
 UGen outLeft, outRight;
 
@@ -60,6 +60,7 @@ new FxChorus @=> fxBattery[2];
 new FxReverb @=> fxBattery[3];
 new FxFlanger @=> fxBattery[4];
 new FxDelayVariable @=> fxBattery[5];
+new FxGate @=> fxBattery[6];
 
 fxChainBuild();
 
