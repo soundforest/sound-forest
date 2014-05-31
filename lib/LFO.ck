@@ -57,10 +57,7 @@ public class LFO {
     }
 
     fun float sineOsc( float freq, float amount ) {
-        // invert frequency to convert to duration
-        1 / freq => freq;
-
-        return Math.sin( now / freq::second ) * amount;
+        return Math.sin( now / second * freq * Math.PI * 2 ) * amount;
     }
 
     // sample and hold oscillator
