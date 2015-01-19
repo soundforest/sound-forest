@@ -71,7 +71,7 @@ sub initialise {
     # sleeps give time for chuck to initliaise
     sleep 1;
 
-    system( "$config->{path_to_chuck} + initialise.ck" );
+    system( "$config->{path_to_chuck} + initialise.ck:\"$config->{bpm}\"" );
 
     # as above
     sleep 1;

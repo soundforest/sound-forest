@@ -29,6 +29,9 @@ source_files=audio/loops
 # note the more sounds the more potential jumbling and more CPU gets used
 concurrent_sounds=2
 
+# set bpm for fx settings (delay size, LFO frequencies)
+bpm=75
+
 # fx settings
 fx_chain_enabled=1
 

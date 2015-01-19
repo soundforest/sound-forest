@@ -24,11 +24,15 @@
     Increase the size of the array to get more channels
     Due to Kassen, see http://wiki.cs.princeton.edu/index.php/buses
 */
+
 public class Control {
     static Gain @ leftOut;
     static Gain @ rightOut;
     static Gain @ fxIn;
     static int sampleActive[];
+    static float bpm;
+    static float bpmIntervalsShort[];
+    static float bpmIntervalsLong[];
 
     static OscSend @ oscSend;
 
@@ -39,6 +43,9 @@ public class Control {
 
     fun static int getSampleActive( int index ) {
         return sampleActive[ index - 1 ];
+    }
+
+    fun void setBpmIntervalsShort() {
     }
 }
 
@@ -65,6 +72,35 @@ Control.fxIn => blackhole;
 
 new OscSend @=> Control.oscSend;
 Control.oscSend.setHost("localhost", 3141);
+
+// Centralised BPM management
+Std.atof( me.arg(0) ) => float bpm;
+bpm => Control.bpm;
+( 60 / bpm ) => float bpmInterval;
+
+[
+     bpmInterval / 8,
+     bpmInterval / 6,
+     bpmInterval / 5 * 2,
+     bpmInterval / 4, // quaver
+     bpmInterval / 3,
+     bpmInterval / 2,
+     bpmInterval / 3 * 2,
+     bpmInterval / 4 * 3, // 3 quavers
+     bpmInterval * ( 3.0 / 2.0 ),
+     bpmInterval * 2,
+     bpmInterval * ( 5.0 / 2.0 )
+] @=> Control.bpmIntervalsShort;
+
+[
+     bpmInterval * 4 * 3, // 3 'bars'
+     bpmInterval * 14, // 3.5 'bars'
+     bpmInterval * 4 * 4, // 4 'bars'
+     bpmInterval * 3 * 6, // 4.5
+     bpmInterval * 4 * 5, // 5
+     bpmInterval * 4 * 6, // 5
+     bpmInterval * 4 * 8
+] @=> Control.bpmIntervalsLong;
 
 while( true ) {
    10::second => now;

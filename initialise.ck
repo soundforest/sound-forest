@@ -19,9 +19,10 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
     U.S.A.
 -----------------------------------------------------------------------------*/
-
+Std.atof( me.arg(0) ) => float bpm;
 me.dir() + "lib/" => string lib_path;
-Machine.add(lib_path + "/Control.ck");
+
+Machine.add(lib_path + "/Control.ck:" + bpm);
 Machine.add(lib_path + "/Chooser.ck");
 Machine.add(lib_path + "/LFO.ck");
 Machine.add(lib_path + "/Fader.ck");
