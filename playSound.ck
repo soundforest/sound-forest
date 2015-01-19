@@ -33,7 +33,7 @@ Chooser chooser;
 me.arg(0) => string filepath;
 
 // use PainGain's gain by default
-0.7 => float maxGain;
+0.3 => float maxGain;
 maxGain => pan.gain;
 
 // set up buf
