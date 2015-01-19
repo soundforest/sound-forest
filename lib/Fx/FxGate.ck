@@ -31,11 +31,11 @@ public class FxGate extends Fx {
     fun string idString() { return "FxGate"; }
 
     fun void initialise() {
-        chooser.getFloat( 20, 40 ) => lfoBaseFreq;
+        chooser.getFloat( 2, 10 ) => lfoBaseFreq;
         chooser.getFloat( 0.01, 0.1 ) => lfoOscFreq;
         chooser.getFloat( 5, 10 ) => lfoOscAmount;
 
-        0.49 => amount;
+        0.89 => amount;
 
         input => g => output;
         <<< "   FxGate: sine at", lfoBaseFreq, "Hz", "lfo amount:", amount >>>;
