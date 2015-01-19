@@ -68,7 +68,8 @@ public class FxFilter extends Fx {
             // and s/h a bit old fash
             "sine" => oscType;
 
-            chooser.getFloat( 0.05, 0.5 ) => lfoFreq;
+            Control.bpmIntervalsLong @=> float lfoFreqs[];
+            1 / lfoFreqs[ chooser.getInt( 0, lfoFreqs.cap() - 1 ) ] => lfoFreq;
 
             // sample hold is better when its faster...
             if ( oscType != "sine" ) {
