@@ -51,10 +51,14 @@ Dyno dynoR => dac.right;
 dynoL.limit();
 dynoR.limit();
 
-Control.leftOut => dynoL; // left 'dry' out
-Control.rightOut => dynoR; // right 'dry' out
+Control.leftOut => LPF LPFLeft => dynoL; // left 'dry' out
+Control.rightOut => LPF LPFRight => dynoR; // right 'dry' out
 
-0.5 => Control.fxIn.gain;
+// Roll off upper end of frequencies
+2000 => LPFRight.freq;
+2000 => LPFLeft.freq;
+
+0.3 => Control.fxIn.gain;
 Control.fxIn => blackhole;
 
 [ 0, 0 ] @=> Control.sampleActive;
