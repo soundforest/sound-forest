@@ -27,6 +27,26 @@ public class FxDelay extends Fx {
     0.5 => feedback.gain;
     delay => feedback;
     feedback => input;
+    60.0 / 75.0 * 1000.0 => float beatInterval; // BI = beat interval in ms;
+
+    // select a few interesting delay values
+    [
+         beatInterval / 8,
+         beatInterval / 6,
+         beatInterval / 5 * 2,
+         beatInterval / 4, // quaver
+         beatInterval / 3,
+         beatInterval / 2,
+         beatInterval / 3 * 2,
+         beatInterval / 4 * 3, // 3 quavers
+         beatInterval * ( 3.0 / 2.0 ),
+         beatInterval * 2,
+         beatInterval * ( 5.0 / 2.0 )
+    ] @=> float delayIntervals[];
+
+    for ( 0 => int i; i < delayIntervals.cap(); i++ ) {
+        <<< delayIntervals[ i ] >>>;
+    }
 
     fun string idString() {
         return "FxDelay";
@@ -34,7 +54,8 @@ public class FxDelay extends Fx {
 
     fun void initialise() {
         1 => active;
-        chooser.getInt( 200, 2000 ) => int delayLength;
+        chooser.getInt( 0, delayIntervals.cap() - 1 ) => int targetDelay;
+        delayIntervals[ targetDelay ] $ int => int delayLength;
         2000 => int delayMax;
         chooser.getFloat( 0.4, 0.7 ) => float delayMix;
         <<< "   FxDelay: delayLength", delayLength, "delayMax", delayMax, "delayMix", delayMix >>>;
