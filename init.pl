@@ -95,6 +95,8 @@ sub initialise {
         system( "$config->{path_to_chuck} + playSound.ck:" . '"' . $file . '"' );
         $count++;
     }
+
+    system( "$config->{path_to_chuck} + placenta.ck" );
 }
 
 # OSC 'server' process. Runs indefinitely
