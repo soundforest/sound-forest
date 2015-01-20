@@ -25,14 +25,22 @@ Panner panner;
 Fader fader;
 
 Std.atoi( me.arg(0) ) => int maxConcurrentFx;
-
 Gain inputGain;
 Pan2 outputPan;
 0 => outputPan.gain;
 
 // spork ~ panner.initialise(outputPan);
 Fx @ fxChain[ maxConcurrentFx ];
-Fx @ fxBattery[7];
+
+[
+     new FxDelay,
+     new FxFilter,
+     new FxChorus,
+     new FxReverb,
+     new FxFlanger,
+     new FxDelayVariable,
+    new FxGate
+] @=> Fx fxBattery[];
 
 UGen outLeft, outRight;
 
@@ -53,14 +61,6 @@ else {
     outputPan.left => delay => outLeft;
     outputPan.right => outRight;
 }
-
-new FxDelay @=> fxBattery[0];
-new FxFilter @=> fxBattery[1];
-new FxChorus @=> fxBattery[2];
-new FxReverb @=> fxBattery[3];
-new FxFlanger @=> fxBattery[4];
-new FxDelayVariable @=> fxBattery[5];
-new FxGate @=> fxBattery[6];
 
 fxChainBuild();
 
