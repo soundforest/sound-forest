@@ -96,7 +96,9 @@ sub initialise {
         $count++;
     }
 
-    system( "$config->{path_to_chuck} + placenta.ck" );
+    if ( $config->{womb_simulator} ) {
+        system( "$config->{path_to_chuck} + womb.ck" );
+    }
 }
 
 # OSC 'server' process. Runs indefinitely

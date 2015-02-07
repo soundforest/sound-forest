@@ -40,6 +40,10 @@ fx_chain_enabled=1
 # a Raspberry pi
 fx_max_concurrent_effects=2
 
+# Sound Forest provides a womb simulator (placental pulse plus low
+# frequency noise which may or may not be useful getting newborns to sleep
+womb_simulator=1
+
 # bufsize is chuck's sample buffer setting. For convenience this can be
 # specified here. Theoretically a higher buffer means smoother playback. YMMV
 bufsize=8192
