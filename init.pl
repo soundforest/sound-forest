@@ -206,19 +206,19 @@ sub restart_check {
     # The ChucK mailing list and documentation is vague about memory management
     # and garbage collection, but it looks like this issue isn't going to be
     # resolved any time soon, so we'll have to go with outside intervention to
-    # manage memory buildup.
+    # manage memory leakage
     #
     # One of the primary goals of Sound Forest is for it to run indefinitely, so
     # we need to ensure that the memory leakage doesn't bring down the system.
     #
-    # There are three scenarios in which Sound Forest should be restarted
-    # 1 when the sample queue has been exhausted (as a polite housekeeping
+    # There are three scenarios in which Sound Forest should be restarted:
+    # 1. The sample queue has been exhausted (as a polite housekeeping
     #   exercise, not managed here)
-    # 2 when the chuck process has used more than 50% of system memory
-    # 3 when more than 80% of memory has been utilised, to stop chuck bringing
-    #   down the system
+    # 2. The chuck process itself has used more than 50% of system memory
+    # 3. More than 80% of memory has been utilised (all processed), to stop
+    # chuck bringing down the system.
     #
-    # Sound forest is intended as a single use device (ie, nothing other than
+    # Sound Forest is intended as a single use device (ie, nothing other than
     # system processes should be utilising resources) but it seems polite
     # nontheless to assume a limit of 50% of total resources, in the case
     # where a user decides to utilise some other software on their system - it is
@@ -226,13 +226,13 @@ sub restart_check {
     # likely with longer samples, as samples lengths plus leakage are more likely
     # to tip the threshold.
 
-    # scenario no.2
+    # Scenario no.2
     if ( $memtotal / 2 < $chuck_resident_mem_used ) {
         print "Restarting sound forest (free memory below 20%)\n";
         return 1;
     }
 
-    # scenario no. 3
+    # Scenario no. 3
     if ( $realfree * 5 < $memtotal ) {
         print "Restarting sound forest (chuck process using more than 50% system memory)\n";
         return 1;
