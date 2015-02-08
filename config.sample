@@ -22,12 +22,17 @@
 
 # since we're intending to use bare perl on RPI, let's make config *really*
 # simple
-path_to_chuck=./chuck
-source_files=audio/loops
+chuck_path=./chuck
+play_sound_path=audio/play-sounds
+dice_sound_path=audio/dice-sounds
 
+# play_sounds play a sound file through as is (with the odd bit of reversal)
 # determine the maximum number of sounds to play simultaneously
 # note the more sounds the more potential jumbling and more CPU gets used
-concurrent_sounds=2
+play_sounds=0
+
+# dice_sounds chops up sounds more aggressively
+dice_sounds=1
 
 # set bpm for fx settings (delay size, LFO frequencies)
 bpm=75

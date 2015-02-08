@@ -33,6 +33,9 @@ public class Control {
     static float bpm;
     static float bpmIntervalsShort[];
     static float bpmIntervalsLong[];
+    static dur beatDur;
+    static int beatLength;
+    static int srate;
 
     static OscSend @ oscSend;
 
@@ -74,9 +77,10 @@ new OscSend @=> Control.oscSend;
 Control.oscSend.setHost("localhost", 3141);
 
 // Centralised BPM management
-Std.atof( me.arg(0) ) => float bpm;
-bpm => Control.bpm;
-( 60 / bpm ) => float bpmInterval;
+Std.atof( me.arg(0) ) => Control.bpm;
+Std.atoi( me.arg(1) ) => Control.srate;
+
+( 60 / Control.bpm ) => float bpmInterval;
 
 [
      bpmInterval / 8,
@@ -101,6 +105,9 @@ bpm => Control.bpm;
      bpmInterval * 4 * 6, // 5
      bpmInterval * 4 * 8
 ] @=> Control.bpmIntervalsLong;
+
+bpmInterval::second => Control.beatDur;
+( bpmInterval * Control.srate ) $ int => Control.beatLength;
 
 while( true ) {
    10::second => now;

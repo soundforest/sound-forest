@@ -6,7 +6,7 @@ SndBuf buf => dac;
 // "audio/dice-sounds/miles davis brass papr.wav" => buf.read;
 // "audio/one-shot/forward aso chanteuse no2.wav" => buf.read;
 <<< "Dicing with", file >>>;
-// file => buf.read;
+file => buf.read;
 buf.length() => dur length;
 1 => buf.loop;
 0.5 => buf.gain;

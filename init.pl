@@ -30,24 +30,35 @@ use Cwd;
 use Net::OpenSoundControl::Server;
 use Sys::Statistics::Linux::MemStats;
 use Sys::Statistics::Linux::Processes;
+use Data::Dump qw(dump);
 
 my $config = get_config();
 
 # determine if we have minimum settings to kick things off
 if (
-    not defined $config->{path_to_chuck}
-    or not defined $config->{source_files}
+    not defined $config->{chuck_path}
+    or not defined $config->{play_sound_path} and $config->{play_sounds}
+    or not defined $config->{dice_sound_path} and $config->{dice_sounds}
 ) {
     die "Insufficient settings to run program. Does config file exist and contain settings? See sample-config for details";
 }
 
-my $flush_dir = $config->{cwd};
-my $audio_path = $flush_dir . '/' . $config->{source_files};
+my $cwd = $config->{cwd};
 my $restarting = 0;
 
-chdir $flush_dir;
+chdir $cwd;
 
-my @source_files = get_files_list();
+my @play_sound_files;
+my @dice_sound_files;
+
+if ( $config->{play_sounds} ) {
+    @play_sound_files = get_files_list( $config->{play_sound_path} );
+}
+
+if ( $config->{dice_sounds} ) {
+    @dice_sound_files = get_files_list( $config->{dice_sound_path} );
+}
+
 my $osc_server = Net::OpenSoundControl::Server->new(
     Port => 3141,
     Handler => \&process_osc_notifications,
@@ -66,38 +77,47 @@ sub initialise {
     my $bufsize = $config->{bufsize} || 4096;
     my $srate = $config->{srate} || 32000;
 
-    system( "$config->{path_to_chuck} --loop --srate$srate --bufsize$bufsize &" );
+    system( "$config->{chuck_path} --loop --srate$srate --bufsize$bufsize &" );
 
     # sleeps give time for chuck to initliaise
     sleep 1;
 
-    system( "$config->{path_to_chuck} + initialise.ck:\"$config->{bpm}\"" );
+    system( "$config->{chuck_path} + initialise.ck:\"$config->{bpm}\":\"$srate\"" );
 
     # as above
     sleep 1;
 
     # initialise can be called when we don't have any @source_files left
     # so we need to check
-    if ( ! @source_files ) {
-        @source_files = get_files_list();
+    if ( ! @play_sound_files ) {
+        @play_sound_files = get_files_list( $config->{play_sound_path} );
     }
 
     # If fx switched on in config, enable
     if ( $config->{fx_chain_enabled} ) {
-        system( "$config->{path_to_chuck} + playFxChain.ck:" . '"' . $config->{fx_max_concurrent_effects} . '"' );
+        system( "$config->{chuck_path} + playFxChain.ck:$config->{fx_concurrent_effects}" );
     }
 
     # kick off samples playback
     my $count = 0;
 
-    while ( $count < $config->{concurrent_sounds} ) {
-        my $file = pop @source_files;
-        system( "$config->{path_to_chuck} + playSound.ck:" . '"' . $file . '"' );
+    while ( $count < $config->{play_sounds} ) {
+        my $file = pop @play_sound_files;
+        system( "$config->{chuck_path} + playSound.ck:" . '"' . $file . '"' );
+        $count++;
+    }
+
+    $count = 0;
+
+    while ( $count < $config->{dice_sounds} ) {
+        my $file = pop @dice_sound_files;
+        dump $file;
+        system( "$config->{chuck_path} + diceSound.ck:" . '"' . $file . '"' );
         $count++;
     }
 
     if ( $config->{womb_simulator} ) {
-        system( "$config->{path_to_chuck} + womb.ck" );
+        system( "$config->{chuck_path} + womb.ck" );
     }
 }
 
@@ -123,37 +143,35 @@ sub process_osc_notifications {
         # program
         $restarting = 1;
         print "FADING OUT\n";
-        system( "$config->{path_to_chuck} + fadeMix.ck" );
+        system( "$config->{chuck_path} + fadeMix.ck" );
         return;
     }
 
     # if we aren't already in a restart process or we've
     # discovered we need to kick off a restart process, carry on...
     if ( $message->[0] eq 'playSound' ) {
-        chdir $flush_dir;
+        chdir $cwd;
 
-        if ( ! @source_files ) {
+        if ( ! @play_sound_files ) {
             $restarting = 1;
-            system( "$config->{path_to_chuck} + fadeMix.ck" );
-            system( "$config->{path_to_chuck} + testSine.ck" );
+            system( "$config->{chuck_path} + fadeMix.ck" );
+            system( "$config->{chuck_path} + testSine.ck" );
         }
 
-        my $filename = pop @source_files;
+        my $filename = pop @play_sound_files;
         print "Got playSound notification, playing $filename\n";
-        system( "$config->{path_to_chuck} + playSound.ck:" . '"' . $filename . '"');
+        system( "$config->{chuck_path} + playSound.ck:" . '"' . $filename . '"');
     }
 
     if ( $message->[0] eq 'playFxChain' ) {
         print "Got playFxChain notification, regenerating\n";
-        system( "$config->{path_to_chuck} + playFxChain.ck:" . '"' . $config->{fx_max_concurrent_effects} . '"' );
+        system( "$config->{chuck_path} + playFxChain.ck:" . '"' . $config->{fx_concurrent_effects} . '"' );
     }
 }
 
 sub reinitialise {
     print "Reinitialising sound forest $restarting\n";
     $restarting = 0;
-
-    system( "$config->{path_to_chuck} + testSine.ck" );
 
     my $chuck_master_pid = get_chuck_master_pid();
 
@@ -168,10 +186,11 @@ sub reinitialise {
 }
 
 sub get_files_list {
-   my $glob_target = $config->{source_files} . '/*.wav';
-   @source_files = glob( $glob_target );
-   @source_files = List::Util::shuffle( @source_files );
-   return @source_files;
+    my $path = shift;
+    my $glob_target = $path . '/*.wav';
+    my @source_files = glob( $glob_target );
+    @source_files = List::Util::shuffle( @source_files );
+    return @source_files;
 }
 
 sub restart_check {
@@ -256,13 +275,6 @@ sub get_chuck_master_pid {
 sub get_config {
     open( my $fh, './config' ) or die "Cannot open config file";
     my @config_rows = <$fh>;
-
-    # define config hashref with reasonable defaults
-    my $config = {
-        concurrent_sounds => 2,
-        fx_chain_enabled => 1,
-        fx_max_concurrent_effects => 2,
-    };
 
     foreach my $row ( @config_rows ) {
         next if ( $row =~ /^(#|\n$)/ );

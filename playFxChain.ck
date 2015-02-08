@@ -25,6 +25,7 @@ Panner panner;
 Fader fader;
 
 Std.atoi( me.arg(0) ) => int maxConcurrentFx;
+
 Gain inputGain;
 Pan2 outputPan;
 0 => outputPan.gain;
