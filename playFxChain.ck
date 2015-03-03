@@ -40,7 +40,8 @@ Fx @ fxChain[ maxConcurrentFx ];
      new FxReverb,
      new FxFlanger,
      new FxDelayVariable,
-    new FxGate
+     new FxGate,
+     new FxHarmonicDelay
 ] @=> Fx fxBattery[];
 
 UGen outLeft, outRight;
