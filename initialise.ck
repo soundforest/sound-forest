@@ -39,3 +39,5 @@ Machine.add(lib_path + "/Fx/FxGate.ck");
 Machine.add(lib_path + "/Fx/FxHarmonicDelay.ck");
 Machine.add(lib_path + "/Fx/DownSampler.ck");
 Machine.add(lib_path + "/Fx/FxDownSampler.ck");
+Machine.add(lib_path + "/Fx/ReverseDelay.ck");
+Machine.add(lib_path + "/Fx/FxReverseDelay.ck");
