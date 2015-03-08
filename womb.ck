@@ -14,7 +14,7 @@ Noise noise => LPF lpf => dac;
 
 
 me.dir() + "audio/heartbeat.wav" => buf.read;
-( 60.0 / bpm * 44100 ) $ int => int beat_length;
+( 60.0 / bpm * Control.srate ) $ int => int beat_length;
 
 fader.fadeIn( 5::second, 0.7, buf );
 fader.fadeIn( 5::second, 0.1, noise );
