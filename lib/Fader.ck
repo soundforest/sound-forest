@@ -48,6 +48,21 @@ public class Fader {
         spork ~ fade( fadeTime, timeIncrement, gainIncrement, gen );
     }
 
+    fun static void fadeInBlocking( dur fadeTime, float finalGain, UGen gen ) {
+        getTimeIncrement( fadeTime )  => dur timeIncrement;
+        getGainIncrement( finalGain ) => float gainIncrement;
+
+        fade( fadeTime, timeIncrement, gainIncrement, gen );
+    }
+
+    fun static void fadeOutBlocking( dur fadeTime, UGen gen ) {
+        getTimeIncrement( fadeTime ) => dur timeIncrement;
+        getGainIncrement( gen.gain() ) => float gainIncrement;
+        -gainIncrement => gainIncrement;
+
+        fade( fadeTime, timeIncrement, gainIncrement, gen );
+    }
+
     fun static void fade( dur fadeTime, dur timeIncrement, float gainIncrement, UGen gen ) {
         while( fadeTime > 0::second ) {
             gen.gain() => float currGain;
