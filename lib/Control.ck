@@ -35,6 +35,7 @@ public class Control {
     static float bpmIntervalsLong[];
     static dur beatDur;
     static int beatLength;
+    static int barLength;
     static int srate;
 
     static OscSend @ oscSend;
@@ -61,12 +62,8 @@ Dyno dynoR => dac.right;
 dynoL.limit();
 dynoR.limit();
 
-Control.leftOut => LPF LPFLeft => dynoL; // left 'dry' out
-Control.rightOut => LPF LPFRight => dynoR; // right 'dry' out
-
-// Roll off upper end of frequencies
-2000 => LPFRight.freq;
-2000 => LPFLeft.freq;
+Control.leftOut => dynoL; // left 'dry' out
+Control.rightOut => dynoR; // right 'dry' out
 
 0.3 => Control.fxIn.gain;
 Control.fxIn => blackhole;
@@ -108,6 +105,7 @@ Std.atoi( me.arg(1) ) => Control.srate;
 
 bpmInterval::second => Control.beatDur;
 ( bpmInterval * Control.srate ) $ int => Control.beatLength;
+( Control.beatLength * 4 ) => Control.barLength;
 
 while( true ) {
    10::second => now;
