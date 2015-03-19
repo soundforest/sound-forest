@@ -1,34 +1,54 @@
 me.arg(0) => string file;
 
-SndBuf buf => dac;
-// "audio/one-shot/lauterbrunnen - stops on request.wav" => buf.read;
-// "audio/one-shot/richard nunns flute loop3.wav" => buf.read;
-// "audio/dice-sounds/miles davis brass papr.wav" => buf.read;
-// "audio/one-shot/forward aso chanteuse no2.wav" => buf.read;
 <<< "Dicing with", file >>>;
-file => buf.read;
-buf.length() => dur length;
-1 => buf.loop;
-0.5 => buf.gain;
-buf.samples() => int samples;
-buf => Control.fxIn;
-[
-    // -0.5, -0.666, -0.75, -0.8, -1.0, -1.2, -1.333, -1.5, -2.0,
-    // 0.5, 0.666, 0.75, 0.8, 1.0, 1.2, 1.333, 1.5, 2.0
 
-    // major? key
-    // 0.5, 0.5625, 0.625, 0.665, 0.75, 0.8335, 0.875,
-    // 1, 1.125, 1.25, 1.3333, 1.5, 1.6667, 1.75,
-    0.5, 1, 1.25, 1.3333, 1.5, 1.75, 2
-    -0.5, -1, -1.25, -1.3333, -1.5, -1.75, -2
-] @=> float speeds[];
+Chooser c;
+Fader f;
+Gain g;
 
-0 => float choice;
-0 => int note;
+0 => g.gain;
+g => Control.leftOut;
+g => Control.rightOut;
 
-while ( 1 ) {
-    Control.beatLength::samp => now;
-    speeds[ Math.random2(0, speeds.cap() - 1 ) ] => choice;
+DiceSound dice;
 
-    choice => buf.rate;
+c.getInt(1,4) => int choice;
+
+
+if ( choice == 1 ) {
+    new ForwardBackwardLoop @=> dice;
 }
+
+if ( choice == 2 ) {
+    new RateShift @=> dice;
+}
+
+if ( choice == 3 ) {
+    new SlideRate @=> dice;
+}
+
+if ( choice == 4 ) {
+    new RepeatLoop @=> dice;
+}
+
+dice.initialise( file );
+spork ~ dice.activity();
+f.fadeIn( 10::second, 0.5, g );
+dice.buf => g;
+dice.buf => Control.fxIn;
+c.getDur( 20, 30 ) => dur duration;
+
+<<< "duration", duration / Control.srate >>>;
+
+duration => now;
+
+f.fadeOutBlocking(10::second, g);
+
+0 => dice.active;
+<<< "active", dice.active >>>;
+dice.buf =< g =< Control.leftOut;
+dice.buf =< g =< Control.rightOut;
+
+// Tell the server to spawn another
+Control.oscSend.startMsg("diceSound", "i");
+1 => Control.oscSend.addInt;
