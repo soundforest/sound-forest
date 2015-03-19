@@ -111,7 +111,6 @@ sub initialise {
 
     while ( $count < $config->{dice_sounds} ) {
         my $file = pop @dice_sound_files;
-        dump $file;
         system( "$config->{chuck_path} + diceSound.ck:" . '"' . $file . '"' );
         $count++;
     }
@@ -155,12 +154,26 @@ sub process_osc_notifications {
         if ( ! @play_sound_files ) {
             $restarting = 1;
             system( "$config->{chuck_path} + fadeMix.ck" );
-            system( "$config->{chuck_path} + testSine.ck" );
         }
+        else {
+            my $filename = pop @play_sound_files;
+            print "Got playSound notification, playing $filename\n";
+            system( "$config->{chuck_path} + playSound.ck:" . '"' . $filename . '"');
+        }
+    }
 
-        my $filename = pop @play_sound_files;
-        print "Got playSound notification, playing $filename\n";
-        system( "$config->{chuck_path} + playSound.ck:" . '"' . $filename . '"');
+    if ( $message->[0] eq 'diceSound' ) {
+        chdir $cwd;
+
+        if ( ! @dice_sound_files ) {
+            $restarting = 1;
+            system( "$config->{chuck_path} + fadeMix.ck" );
+        }
+        else {
+            my $filename = pop @dice_sound_files;
+            print "Got diceSound notification, playing $filename\n";
+            system( "$config->{chuck_path} + diceSound.ck:" . '"' . $filename . '"');
+        }
     }
 
     if ( $message->[0] eq 'playFxChain' ) {
