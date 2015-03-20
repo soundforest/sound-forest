@@ -46,3 +46,4 @@ Machine.add(lib_path + "/DiceSound/ForwardBackwardLoop.ck");
 Machine.add(lib_path + "/DiceSound/RateShift.ck");
 Machine.add(lib_path + "/DiceSound/SlideRate.ck");
 Machine.add(lib_path + "/DiceSound/RepeatLoop.ck");
+Machine.add(lib_path + "/DiceSound/Wobbulator.ck");

@@ -12,7 +12,7 @@ g => Control.rightOut;
 
 DiceSound dice;
 
-c.getInt(1,4) => int choice;
+c.getInt(1,5) => int choice;
 
 
 if ( choice == 1 ) {
@@ -29,6 +29,10 @@ if ( choice == 3 ) {
 
 if ( choice == 4 ) {
     new RepeatLoop @=> dice;
+}
+
+if ( choice == 5 ) {
+    new Wobbulator @=> dice;
 }
 
 dice.initialise( file );
