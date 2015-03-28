@@ -92,4 +92,16 @@ public class Chooser {
         }
         return outputFiles;
     }
+
+    fun float getIntervalLong() {
+        getInt( 0, Control.bpmIntervalsLong.cap() - 1 ) => int choice;
+
+        return Control.bpmIntervalsLong[ choice ];
+    }
+
+    fun float getIntervalShort() {
+        getInt( 0, Control.bpmIntervalsShort.cap() - 1 ) => int choice;
+
+        return Control.bpmIntervalsShort[ choice ];
+    }
 }
