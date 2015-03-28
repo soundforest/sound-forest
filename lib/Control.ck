@@ -48,9 +48,6 @@ public class Control {
     fun static int getSampleActive( int index ) {
         return sampleActive[ index - 1 ];
     }
-
-    fun void setBpmIntervalsShort() {
-    }
 }
 
 new Gain @=> Control.leftOut;
