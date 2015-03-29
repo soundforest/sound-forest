@@ -118,6 +118,10 @@ sub initialise {
     if ( $config->{womb_simulator} ) {
         system( "$config->{chuck_path} + womb.ck" );
     }
+
+    if ( $config->{drum_machine} ) {
+        system( "$config->{chuck_path} + drumMachine.ck:808" );
+    }
 }
 
 # OSC 'server' process. Runs indefinitely
