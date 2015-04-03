@@ -14,7 +14,6 @@ DiceSound dice;
 
 c.getInt(1,5) => int choice;
 
-
 if ( choice == 1 ) {
     new ForwardBackwardLoop @=> dice;
 }
@@ -33,6 +32,10 @@ if ( choice == 4 ) {
 
 if ( choice == 5 ) {
     new Wobbulator @=> dice;
+}
+
+if ( choice == 6 ) {
+    new Divisions @=> dice;
 }
 
 dice.initialise( file );
