@@ -23,17 +23,28 @@
 public class FxHarmonicDelay extends Fx {
     Delay delay;
     Chooser c;
+    LFO lfo;
     input => delay => output;
     Gain feedback;
-    -0.9 => feedback.gain;
     delay => feedback;
     feedback => input;
+    c.getInt( 0, 1 ) => int doOscFeedback;
+    ( 1 / c.getIntervalLong() ) => float oscFeedbackFreq;
+
     60.0 / Control.bpm * 1000.0 => float beatInterval; // BI = beat interval in ms;
+
+    [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 37 ] @=> int midiNotes[];
+
+    c.getInt( 0, midiNotes.cap() - 1 ) => int choice;
+    midiNotes[ choice ] => Std.mtof => float baseFreq;
+
+    1 / baseFreq => baseFreq;
 
     // select a few interesting delay values
     Control.bpmIntervalsShort @=> float delayIntervals[];
-    1.0 / 55 => float baseFreq;
-    [ 0.25, 0.5, 0.75, 1.5, 2.0 ] @=> float factors[];
+
+    [ 1.0, 1.333, 1.5, 2.0, 2.666, 2.5, 3.0, 4.0, 5.0, 6.0 ] @=> float factors[];
+
     baseFreq => float delayAmount;
 
     fun string idString() {
@@ -57,6 +68,11 @@ public class FxHarmonicDelay extends Fx {
     fun void activity() {
         // set a delay frequency and a period for that delay to be in place
         // using the factors array
+
+        if ( doOscFeedback ) {
+            spork ~ oscFeedback();
+        }
+
         while ( active ) {
             factors[ c.getInt(0, factors.cap() - 1) ] => float choice;
             ( beatInterval * choice )::ms => now;
@@ -67,5 +83,12 @@ public class FxHarmonicDelay extends Fx {
 
         input =< delay =< output;
         delay =< feedback =< input;
+    }
+
+    fun void oscFeedback() {
+        while ( active ) {
+            lfo.osc( oscFeedbackFreq, 0.25, "sine" ) + 0.7 => feedback.gain;
+            10::ms => now;
+        }
     }
 }
