@@ -93,6 +93,10 @@ sub initialise {
         @play_sound_files = get_files_list( $config->{play_sound_path} );
     }
 
+    if ( ! @dice_sound_files ) {
+        @dice_sound_files = get_files_list( $config->{dice_sound_path} );
+    }
+
     # If fx switched on in config, enable
     if ( $config->{fx_chain_enabled} ) {
         system( "$config->{chuck_path} + playFxChain.ck:$config->{fx_concurrent_effects}" );
