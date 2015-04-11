@@ -37,6 +37,7 @@ my $config = get_config();
 # determine if we have minimum settings to kick things off
 if (
     not defined $config->{chuck_path}
+    or not defined $config->{mode}
     or not defined $config->{play_sound_path} and $config->{play_sounds}
     or not defined $config->{dice_sound_path} and $config->{dice_sounds}
 ) {
@@ -62,7 +63,7 @@ if ( $config->{dice_sounds} ) {
 my $osc_server = Net::OpenSoundControl::Server->new(
     Port => 3141,
     Handler => \&process_osc_notifications,
-) or die "Could not start server: $@\n";
+) or die "Could not start OSC server: $@\n";
 
 
 initialise();
@@ -82,7 +83,7 @@ sub initialise {
     # sleeps give time for chuck to initliaise
     sleep 1;
 
-    system( "$config->{chuck_path} + initialise.ck:\"$config->{bpm}\":\"$srate\"" );
+    system( "$config->{chuck_path} + modes/$config->{mode}.ck:\"$config->{bpm}\":\"$srate\"" );
 
     # as above
     sleep 1;
