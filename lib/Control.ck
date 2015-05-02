@@ -56,6 +56,10 @@ new Gain @=> Control.fxIn;
 
 Dyno dynoL => dac.left;
 Dyno dynoR => dac.right;
+
+WvOut2 wv;
+"sound-forest-output" => wv.autoPrefix;
+
 dynoL.limit();
 dynoR.limit();
 
@@ -64,8 +68,12 @@ Control.rightOut => dynoR; // right 'dry' out
 
 0.3 => Control.fxIn.gain;
 Control.fxIn => blackhole;
+dac => wv => blackhole;
 
 [ 0, 0 ] @=> Control.sampleActive;
+
+// this is the output file name
+"special:auto" => wv.wavFilename;
 
 new OscSend @=> Control.oscSend;
 Control.oscSend.setHost("localhost", 3141);
@@ -91,19 +99,24 @@ Std.atoi( me.arg(1) ) => Control.srate;
 ] @=> Control.bpmIntervalsShort;
 
 [
+     bpmInterval * 4,     // 1 'bar'
+     bpmInterval * 4 * 2, // 2 'bars'
+     bpmInterval * 4 * 2.5, // 2 'bars'
      bpmInterval * 4 * 3, // 3 'bars'
-     bpmInterval * 14, // 3.5 'bars'
+     bpmInterval * 14,    // 3.5 'bars'
      bpmInterval * 4 * 4, // 4 'bars'
      bpmInterval * 3 * 6, // 4.5
      bpmInterval * 4 * 5, // 5
-     bpmInterval * 4 * 6, // 5
-     bpmInterval * 4 * 8
+     bpmInterval * 4 * 6, // 6
+     bpmInterval * 4 * 8  // 8
 ] @=> Control.bpmIntervalsLong;
 
 bpmInterval::second => Control.beatDur;
 ( bpmInterval * Control.srate ) $ int => Control.beatLength;
 ( Control.beatLength * 4 ) => Control.barLength;
 
-while( true ) {
-   10::second => now;
+null @=> wv;
+
+while ( true ) {
+    10::second => now;
 }
