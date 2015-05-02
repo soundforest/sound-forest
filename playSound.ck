@@ -21,108 +21,155 @@
 -----------------------------------------------------------------------------*/
 
 
-me.arg(0) => string file;
-Fader fader;
+Fader f;
 
 // set up UGens;
 SndBuf buf;
 Pan2 pan;
 
-1 => int active;
-Chooser chooser;
+Panner p;
+
+Chooser c;
 me.arg(0) => string filepath;
 
 // use PainGain's gain by default
-0.3 => float maxGain;
+0.9 => float maxGain;
 maxGain => pan.gain;
 
 // set up buf
 512 => buf.chunks;
 filepath => buf.read;
 
-// set sample loop so we can arbitrarily reverse even at the start
-// of the sample
-1 => buf.loop;
-buf => pan;
+buf => p.pan;
 
-pan.left => Control.leftOut;
-pan.right => Control.rightOut;
+p.pan.left => Control.leftOut;
+p.pan.right => Control.rightOut;
 
 // send buf to fx
 // could make this conditional
 buf => Control.fxIn;
-chooser.getFloat( -1.0, 1.0 ) => pan.pan;
+c.getFloat( -1.0, 1.0 ) => p.pan.pan;
 
-// TODO: reinstate dynamic panning
+buf.length() / 10 => dur fadeTime;
 
-10::second => dur fadeTime;
-
-spork ~ reverseSchedule();
 0 => buf.gain;
-fader.fadeIn( 10::second, 0.8, buf );
 
-// run for determined length of playback, minus fadeout time
-getTiming() => now;
+<<< "Playing", filepath >>>;
 
-fader.fadeOut( 10::second, buf );
+f.fadeInBlocking( fadeTime, 0.8, buf );
 
-// fader sporks so we can fade two channels concurrently
-// so we have to observe time here as well
-10::second => now;
+activity();
+
+f.fadeOutBlocking( fadeTime, buf );
 
 // disconnect
 buf =< pan;
 pan.left =< Control.leftOut;
 pan.right =< Control.rightOut;
-0 => active;
 Control.oscSend.startMsg("playSound", "i");
+
 1 => Control.oscSend.addInt;
 
-// Returns duration of sample playback
-// At the moment we expect the samples given to us to be played for 'long'
-// periods, at least 90 seconds - 2 minutes. Some shorter samples are conducive
-// to looping, and others are intended as 'one-shots'. How do we distinguish
-// the two? We don't. For now, assume all samples passed to this file are
-// intended to play for a while. Next question: how long do we loop for?
-// Let's assume 90 - 150 seconds is a reasonable amount of time for a shortish
-// (30::second) loop to be played.
-fun dur getTiming() {
-    dur timing;
-    buf.length() => dur length;
+fun void activity() {
+    // define convenient threshold for checking if we should bail
+    // for fadeout
+    buf.length() - fadeTime => dur activityEnd;
+    while ( buf.pos()::samp < activityEnd ) {
+        c.getDur(5, 9) => dur duration;
 
-    if ( length < 1::minute ) {
-        chooser.getDur( 90, 150 ) => timing;
-    }
-    else {
-        // timing for 'main sequence' of sample is its length - fade time
-        buf.length() - fadeTime => timing;
-    }
+        // return so we can fade out now
+        if (
+            buf.pos()::samp + duration > buf.length() ||
+            buf.pos()::samp + duration > activityEnd
+        ) {
+            activityEnd - buf.pos()::samp => now;
+            <<< "ACTIVITY ENDING" >>>;
+            return;
+        }
 
-    return timing;
-}
+        if ( c.takeAction( 4 ) ) {
+            c.getInt( 1, 8 ) => int choice;
 
-fun void reverseSchedule() {
-    // give buffer chance to load before trying to reverse as may lead
-    // to dropout because samples at the end haven't been loaded yet
-    2::second => now;
-
-    while ( active ) {
-        chooser.getDur( 5, 10 ) => dur duration;
-
-        // we don't want to reverse too often
-        // 1/32 seems pretty infrequent, but we are checking every 7.5 seconds
-        // on average so you'd expect a reverse event to happen across two 
-        // streams once every couple of minutes
-        if ( chooser.takeAction( 32 ) ) {
-            if ( buf.pos() == 0 ) {
-                buf.samples() => buf.pos;
+            if ( choice == 1 ) {
+                if ( buf.pos()::samp - duration > 0::second ) {
+                    reverse( duration );
+                }
+                else {
+                    // pick something else then
+                    c.getInt( 2, 8 ) => choice;
+                }
             }
-            reverse( duration );
+
+            if ( choice == 2 ) {
+                reepeat();
+            }
+
+            if ( choice == 3 ) {
+                p.pan.pan() => float oldPan;
+                <<< "PANNING", filepath, oldPan >>>;
+                1 => p.active;
+                spork ~ p.changePan( c.getFloat( 0, 1 ), 0.5, "sine" );
+                duration => now;
+                0 => p.active;
+                oldPan => p.pan.pan;
+            }
+
+            if ( choice > 3 ) {
+                effecto(duration, choice);
+            }
         }
         else {
             duration => now;
         }
     }
+}
+
+fun void effecto( dur duration, int choice ) {
+    Fx effect;
+
+    if ( choice == 4 ) {
+        new FxFlanger @=> effect;
+    }
+
+    if ( choice == 5 ) {
+        new FxDelayVariable @=> effect;
+    }
+
+    if ( choice == 6 ) {
+        new FxDownSampler @=> effect;
+    }
+
+    if ( choice == 7 ) {
+        new FxReverb @=> effect;
+    }
+
+    if ( choice == 8 ) {
+        new FxReverseDelay @=> effect;
+    }
+    // effects[ choice ] @=> Fx effect;
+    <<< "EFFECTING", filepath, effect.idString() >>>;
+    buf => effect.input;
+    effect.output => Pan2 fpan;
+    p.pan.pan() => fpan.pan;
+    fpan.left => Control.leftOut;
+    fpan.right => Control.rightOut;
+    0 => fpan.gain;
+
+    effect.initialise();
+
+    f.fadeOut( duration / 2, p.pan );
+    f.fadeIn( duration / 2, 0.8, fpan );
+
+    duration / 2  => now;
+
+    f.fadeIn( duration / 2, 0.8, p.pan );
+    f.fadeOut( duration / 2, effect.output );
+    duration / 2  => now;
+    0 => effect.active;
+
+    fpan =< Control.leftOut;
+    fpan =< Control.rightOut;
+    <<< "UNEFFECTING", filepath, effect.idString() >>>;
 }
 
 fun void reverse( dur duration) {
@@ -133,35 +180,45 @@ fun void reverse( dur duration) {
     setRate( 1.0 );
 }
 
+fun void reepeat() {
+    [ 3, 4, 5, 6, 8 ] @=> int divisions[];
+    c.getInt(0, divisions.cap() - 1 ) => int choice;
+    divisions[ choice ] => int division;
+
+    ( Control.barLength / division ) $ int => int divisionLength;
+    buf.pos() => int repeatoPos;
+    5::ms => dur miniFadeTime;
+
+    c.getInt( 1, 8 ) => int repeato;
+
+    <<< "Reepeating", division, divisionLength, buf.gain() >>>;
+    0 => buf.gain;
+
+    for ( 0 => int i; i < repeato; i++ ) {
+        f.fadeInBlocking( miniFadeTime, 0.8, buf );
+        divisionLength::samp - ( 2 * miniFadeTime ) => now;
+        f.fadeOutBlocking( miniFadeTime, buf );
+        repeatoPos => buf.pos;
+
+        if ( ! c.getInt( 0, 3 ) ) {
+            setRate( -1 );
+        }
+        else {
+            setRate( 1 );
+        }
+    }
+
+    setRate( 1 );
+
+    f.fadeInBlocking( miniFadeTime, 0.8, buf );
+}
+
 // While developing this I want to tune the amount of reversing that
 // that goes on across a stanza. This function logs what's going on
 fun void reverseMessage( string type, dur duration ) {
-    <<< "playSound:", type, filepath, duration / 44100 >>>;
+    <<< "playSound:", type, filepath, duration / Control.srate >>>;
 }
 
 fun void setRate( float rate ) {
     buf.rate( rate );
-}
-
-// API call to give Sample option of killing or lowering
-// its dry output
-// useful for providing variation when using fx chains
-fun void setMixChoice() {
-    chooser.getInt( 0, 8 ) => int mixChoice;
-
-    // if mixChoice is 0, kill dry output
-    // if 1-6, keep dry volume normal
-    // if 7-8, halve volume
-    if ( !mixChoice ) {
-        // set sample dry out to 0
-        0 => setMix;
-    }
-    else if ( mixChoice > 6 ) {
-        // halve dry gain
-        buf.gain() / 2 => setMix;
-    }
-}
-
-fun void setMix( float gain ) {
-    0 => pan.gain;
 }
