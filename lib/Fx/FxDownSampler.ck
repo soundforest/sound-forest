@@ -5,7 +5,8 @@ public class FxDownSampler extends Fx {
     fun string idString() { return "FxDownSampler"; }
 
     fun void initialise() {
-        input => down => output;
+        input => down => Gain g => output;
+        0.7 => g.gain;
         spork ~ activity();
     }
 
