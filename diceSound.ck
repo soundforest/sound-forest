@@ -1,60 +1,57 @@
+Chooser c;
+
 me.arg(0) => string file;
 
-<<< "Dicing with", file >>>;
-
-Chooser c;
 Fader f;
-Gain g;
+Pan2 g;
 
 0 => g.gain;
-g => Control.leftOut;
-g => Control.rightOut;
+g.left => Control.leftOut;
+g.right => Control.rightOut;
+c.getFloat( -1.0, 1.0 ) => g.pan;
 
 DiceSound dice;
 
-c.getInt(1,5) => int choice;
-
+c.getInt(1,4) => int choice;
+2 => choice;
 if ( choice == 1 ) {
-    new ForwardBackwardLoop @=> dice;
-}
-
-if ( choice == 2 ) {
-    new RateShift @=> dice;
-}
-
-if ( choice == 3 ) {
     new SlideRate @=> dice;
 }
 
-if ( choice == 4 ) {
+if ( choice == 2 ) {
     new RepeatLoop @=> dice;
 }
 
-if ( choice == 5 ) {
+if ( choice == 3 ) {
     new Wobbulator @=> dice;
 }
 
-if ( choice == 6 ) {
+if ( choice == 4 ) {
     new Divisions @=> dice;
 }
 
 dice.initialise( file );
-spork ~ dice.activity();
-f.fadeIn( 10::second, 0.5, g );
 dice.buf => g;
-dice.buf => Control.fxIn;
-c.getDur( 20, 30 ) => dur duration;
+g => Control.fxIn;
+dice.getDiceLength() => dur duration;
+duration / 5 => dur fadeLength;
 
-<<< "duration", duration / Control.srate >>>;
+<<< "Dicing with", file, "strategy", dice.idString(), "duration", duration / Control.srate >>>;
+spork ~ dice.activity();
 
-duration => now;
+f.fadeIn( fadeLength, 0.2, g );
+duration - fadeLength => now;
 
-f.fadeOutBlocking(10::second, g);
+f.fadeOutBlocking(fadeLength, g);
 
 0 => dice.active;
 <<< "active", dice.active >>>;
 dice.buf =< g =< Control.leftOut;
 dice.buf =< g =< Control.rightOut;
+
+// before tell the OSC server to kick off another diceSound run,
+// let's wait a bit so we have a bit of breathing space
+( c.getIntervalLong() / 2.0 )::second => now;
 
 // Tell the server to spawn another
 Control.oscSend.startMsg("diceSound", "i");

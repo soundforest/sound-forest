@@ -1,12 +1,17 @@
 public class SlideRate extends DiceSound {
     float endRate;
 
+    fun string idString() { return "SlideRate"; }
+
+    fun dur getDiceLength() {
+        return c.getDur( 5, 20 );
+    }
+
     fun void activity() {
         while ( active ) {
             c.getFloat( -2, 2 ) => float endRate;
             slideRateIterate( buf, 1, endRate);
-
-            ( 1 * Control.beatLength )::samp => now;
+            c.getIntervalLong()::second => now;
         }
     }
 

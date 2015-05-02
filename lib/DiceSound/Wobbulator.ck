@@ -13,6 +13,8 @@ public class Wobbulator extends DiceSound {
         <<< "Wobbulator: random mode, amount", amount, "freq", freq >>>;
     }
 
+    fun string idString() { return "Wobbulator"; }
+
     fun void activity() {
         while ( active ) {
             // random mode
@@ -20,7 +22,6 @@ public class Wobbulator extends DiceSound {
                 if ( c.getInt( 1, 100 ) == 1 ) {
                     c.getFloat(0, 0.2) => amount;
                     c.getFloat(0.5, 10) => freq;
-                    <<< "Wobbulator: amount", amount, "freq", freq >>>;
                 }
             }
 

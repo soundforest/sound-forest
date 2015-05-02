@@ -9,6 +9,9 @@ public class RepeatLoop extends DiceSound {
     int repeato;
     5::ms => dur fadeTime;
     Fader f;
+    1 => buf.loop;
+
+    fun string idString() { return "RepeatLoop"; }
 
     fun void activity() {
         while ( active ) {

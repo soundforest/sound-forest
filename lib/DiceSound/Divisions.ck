@@ -8,6 +8,8 @@ public class Divisions extends DiceSound {
     ( ( ( 60.0 / Control.bpm ) / division $ float ) * Control.srate $ float )
         $ int => int trackDivisionInterval;
 
+    fun string idString() { return "Divisions"; }
+
     fun void initialise( string file ) {
         file => buf.read;
         buf.samples() / division $ int => divisionSamples;

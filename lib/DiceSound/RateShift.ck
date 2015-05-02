@@ -13,6 +13,8 @@ public class RateShift extends DiceSound {
         -0.5, -1, -1.25, -1.3333, -1.5, -1.75, -2
     ] @=> float speeds[];
 
+    fun string idString() { return "RateShift"; }
+
     fun void activity() {
         while ( active ) {
             Control.beatLength::samp => now;
