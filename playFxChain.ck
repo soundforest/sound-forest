@@ -31,20 +31,19 @@ Pan2 outputPan;
 0 => outputPan.gain;
 
 // spork ~ panner.initialise(outputPan);
-Fx @ fxChain[ maxConcurrentFx ];
+Fx @ fxChain[];
 
-[
-     new FxDelay,
-     new FxFilter,
-     new FxChorus,
-     new FxReverb,
-     new FxFlanger,
-     new FxDelayVariable,
-     new FxGate,
-     new FxHarmonicDelay,
-     new FxDownSampler,
-     new FxReverseDelay
-] @=> Fx fxBattery[];
+// [
+//      new FxDelay,
+//      new FxFilter,
+//      new FxChorus,
+//      new FxReverb,
+//      new FxFlanger,
+//      new FxDelayVariable,
+//      new FxHarmonicDelay,
+//      new FxDownSampler,
+//      new FxReverseDelay
+// ] @=> Fx fxBattery[];
 
 UGen outLeft, outRight;
 
@@ -70,7 +69,7 @@ fxChainBuild();
 
 Chooser.getDur( 90, 120 ) => dur fxTime;
 
-fader.fadeIn( 10::second, 0.5, outputPan );
+fader.fadeIn( 10::second, 0.7, outputPan );
 fxTime - ( 2 * 10::second ) => now;
 
 // fader now sporks its own fadeout (cleaner) so we need to keep time
@@ -80,21 +79,264 @@ fader.fadeOut( 10::second, outputPan );
 tearDown();
 
 fun void fxChainBuild() {
-    0 => int i;
+    Chooser.getInt( 1, 21 ) => int choice;
 
-    while( i < maxConcurrentFx ) {
-        chooser.getInt( 0, fxBattery.cap() - 1 ) => int j;
-
-        // need to check if effect for j is already in fxChain
-        if ( effectNotAlreadyPresent( fxBattery[ j ] ) ) {
-            fxBattery[ j ] @=> fxChain[ i ];
-            i++;
-        }
+    if ( choice == 1 ) {
+        [
+            new FxFilter,
+            new FxDelay
+        ] @=> fxChain;
     }
 
-    // fxChain now set up, so wire everything up
+    if ( choice == 2 ) {
+        [
+            new FxDownSampler,
+            new FxDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 3 ) {
+        [
+            new FxDownSampler,
+            new FxFilter,
+            new FxDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 4 ) {
+        [
+            new FxDownSampler,
+            new FxDelay,
+            new FxFlanger
+        ] @=> fxChain;
+    }
+
+    if ( choice == 5 ) {
+        [
+            new FxDelayVariable,
+            new FxDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 6 ) {
+        [
+            new FxFlanger,
+            new FxDelayVariable
+        ] @=> fxChain;
+    }
+
+    if ( choice == 7 ) {
+        [
+            new FxFilter,
+            new FxDelayVariable
+        ] @=> fxChain;
+    }
+
+    if ( choice == 8 ) {
+        [
+            new FxGate,
+            new FxDelayVariable
+        ] @=> fxChain;
+    }
+
+    if ( choice == 9 ) {
+        [
+            new FxDownSampler,
+            new FxDelayVariable
+        ] @=> fxChain;
+    }
+
+    if ( choice == 10 ) {
+        [
+            new FxDownSampler,
+            new FxFilter,
+            new FxDelayVariable
+        ] @=> fxChain;
+    }
+
+    if ( choice == 11 ) {
+        [
+            new FxGate,
+            new FxFilter,
+            new FxDelayVariable
+        ] @=> fxChain;
+    }
+
+    if ( choice == 12 ) {
+        [
+            new FxDownSampler,
+            new FxDelayVariable
+        ] @=> fxChain;
+    }
+
+    if ( choice == 13 ) {
+        [
+            new FxReverseDelay,
+            new FxDelayVariable
+        ] @=> fxChain;
+    }
+
+    if ( choice == 14 ) {
+        [
+            new FxGate,
+            new FxDelayVariable,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 15 ) {
+        [
+            new FxDelayVariable,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 16 ) {
+        [
+            new FxFlanger,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 17 ) {
+        [
+            new FxFilter,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 18 ) {
+        [
+            new FxGate,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 19 ) {
+        [
+            new FxDownSampler,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 20 ) {
+        [
+            new FxDownSampler,
+            new FxFilter,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 21 ) {
+        [
+            new FxGate,
+            new FxFilter,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 22 ) {
+        [
+            new FxDownSampler,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+
+    if ( choice == 23 ) {
+        [
+            new FxDelay,
+            new FxReverb,
+            new FxChorus
+        ] @=> fxChain;
+    }
+
+    if ( choice == 24 ) {
+        [
+            new FxDelay,
+            new FxDownSampler
+        ] @=> fxChain;
+    }
+
+    if ( choice == 25 ) {
+        [
+            new FxDownSampler,
+            new FxDelay,
+            new FxFilter
+        ] @=> fxChain;
+    }
+
+    if ( choice == 26 ) {
+        [
+            new FxDelay,
+            new FxDownSampler,
+            new FxReverb
+        ] @=> fxChain;
+    }
+
+    if ( choice == 27 ) {
+        [
+            new FxDelay,
+            new FxFilter,
+            new FxReverb
+        ] @=> fxChain;
+    }
+
+    if ( choice == 28 ) {
+        [
+            new FxDelay,
+            new FxDownSampler,
+            new FxFilter,
+            new FxReverb
+        ] @=> fxChain;
+    }
+
+    if ( choice == 29 ) {
+        [
+            new FxDelay,
+            new FxFlanger,
+            new FxReverb
+        ] @=> fxChain;
+    }
+
+    <<< "FX CHAIN: ", choice >>>;
     fxChainFx();
 }
+
+// fun void fxChainBuild() {
+//     0 => int i;
+// 
+//     // so this is a bit odd - we want the fx chain to be sufficiently
+//     // differentiated from the source sounds that it sounds like a seperate
+//     // sound in its own right. We want to keep the number of possible
+//     // combinations of effects high (ie not 'preset' designed from start
+//     // to finish, but we also don't want the sound hidden (say if a filter
+//     // chorus, or other non-delay effect where in place, it might be harder
+//     // to distinguish source from effect.
+//     //
+//     // The easiest way to ensure signal and filters are distinguishable is via
+//     // a delay. So in the case our randomly defined effects chain has no delay
+//     // or reverb (ie time-smearing) attribute, we impose a delay unit.
+//     // To detect this we use a string to keep track of what's defined, and
+//     string idStrings;
+// 
+//     while( i < maxConcurrentFx ) {
+//         chooser.getInt( 0, fxBattery.cap() - 1 ) => int j;
+// 
+//         // need to check if effect for j is already in fxChain
+//         if ( effectNotAlreadyPresent( fxBattery[ j ] ) ) {
+//             fxBattery[ j ] @=> fxChain[ i ];
+//             fxBattery[ i ].idString() +=> idStrings;
+//             i++;
+//         }
+//     }
+// 
+//     if ( ! RegEx.match( "Delay", idStrings ) && ! RegEx.match( "Reverb", idStrings ) ) {
+//         new FxDelay @=> fxBattery[ fxBattery.cap() - 1 ];
+//     }
+//     // fxChain now set up, so wire everything up
+//     fxChainFx();
+// }
 
 fun int effectNotAlreadyPresent( Fx fx ) {
     for ( 0 => int j; j < maxConcurrentFx; j++ ) {
@@ -107,7 +349,6 @@ fun int effectNotAlreadyPresent( Fx fx ) {
 }
 
 fun void fxChainFx() {
-    <<< "FXCHAIN:" >>>;
     for ( 0 => int i; i < fxChain.cap(); i++ ) {
         fxChain[ i ] @=> Fx fx;
         <<< i, fx.idString() >>>;
@@ -140,6 +381,7 @@ fun void tearDown() {
     // now we go through and clean up
     for ( 0 => int i; i < fxChain.cap(); i++ ) {
         fxChain[ i ] @=> Fx fx;
+
         if ( i == 0 ) {
             inputGain =< fx.input;
         }
@@ -162,5 +404,3 @@ fun void tearDown() {
     Control.oscSend.startMsg("playFxChain", "i");
     1 => Control.oscSend.addInt;
 }
-
-
