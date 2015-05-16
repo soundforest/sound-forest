@@ -46,6 +46,7 @@ if (
 
 my $cwd = $config->{cwd};
 my $restarting = 0;
+my $count = 0;
 
 chdir $cwd;
 
@@ -88,6 +89,13 @@ sub initialise {
     # as above
     sleep 1;
 
+    if ( $config->{mode} eq 'ambient' ) {
+        ambient();
+    }
+
+}
+
+sub ambient {
     # initialise can be called when we don't have any @source_files left
     # so we need to check
     if ( ! @play_sound_files ) {
@@ -104,28 +112,11 @@ sub initialise {
     }
 
     # kick off samples playback
-    my $count = 0;
 
     while ( $count < $config->{play_sounds} ) {
         my $file = pop @play_sound_files;
         system( "$config->{chuck_path} + playSound.ck:" . '"' . $file . '"' );
         $count++;
-    }
-
-    $count = 0;
-
-    while ( $count < $config->{dice_sounds} ) {
-        my $file = pop @dice_sound_files;
-        system( "$config->{chuck_path} + diceSound.ck:" . '"' . $file . '"' );
-        $count++;
-    }
-
-    if ( $config->{womb_simulator} ) {
-        system( "$config->{chuck_path} + womb.ck" );
-    }
-
-    if ( $config->{drum_machine} ) {
-        system( "$config->{chuck_path} + drumMachine.ck:808" );
     }
 }
 
@@ -133,8 +124,18 @@ sub initialise {
 sub process_osc_notifications {
     my ( $sender, $message ) = @_;
 
+    if ( $config->{mode} eq 'ambient' ) {
+        ambient_osc_notifications( $sender, $message );
+    }
+}
+
+sub ambient_osc_notifications {
+    my ( $sender, $message ) = @_;
+
     if ( $restarting ) {
         if ( $message->[0] eq 'fadeOutComplete' ) {
+
+            $count = 0;
             print "REINITIALISING\n";
             reinitialise();
         }
