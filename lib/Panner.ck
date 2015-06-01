@@ -89,6 +89,19 @@ public class Panner extends LFO {
         spork ~ changePan( freq, amount, oscType );
     }
 
+    fun void panFromFixed( float freq, float amount, string type, dur duration ) {
+        0::second => dur epoch;
+
+        while ( duration > 0::second ) {
+            Math.cos( epoch / second * Math.PI * 2 ) * amount => float val;
+            val => pan.pan;
+            50::ms -=> duration;
+            50::ms +=> epoch;
+            50::ms => now;
+            <<< val >>>;
+        }
+    }
+
     fun void tearDown() {
         0 => active;
     }
