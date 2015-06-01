@@ -1,4 +1,8 @@
 package SoundForest::Mode;
+
+use 5.10.0;
+use strict;
+use warnings;
 use List::Util;
 use Data::Dump qw(dump);
 use List::Util;
@@ -29,8 +33,12 @@ sub initialise {
         die "Insufficient settings to run program. Does config file exist and contain settings? See sample-config for details";
     }
 
-    my $aconfig = $self->get_config( qq{conf/$config->{mode}.conf} );
-    @{ $config{ keys %{ $aconfig } } } = values %{ $aconfig };
+    my $mconfig = $self->get_config( qq{conf/$config->{mode}.conf} );
+
+    foreach my $key ( keys %{ $mconfig } ) {
+        $config->{ $key } = $mconfig->{ $key };
+    }
+
     $config->{cwd} = cwd();
     $self->{config} = $config;
 
@@ -76,8 +84,8 @@ sub reinitialise {
 }
 
 sub kill_master_pid {
-    print "Reinitialising sound forest $ending\n";
-    $ending = 0;
+    my $self = shift;
+    print "Reinitialising sound forest\n";
 
     my $chuck_master_pid = $self->get_chuck_master_pid();
 
@@ -99,6 +107,7 @@ sub get_files_list {
 
 sub get_config {
     my ( $self, $path ) = @_;
+    my $config = {};
 
     open( my $fh, $path ) or die "Cannot open config file";
     my @config_rows = <$fh>;
@@ -107,7 +116,7 @@ sub get_config {
         next if ( $row =~ /^(#|\n$)/ );
         chomp $row;
         my ( $key, $value ) = split( '=', $row );
-        $config->{$key} = $value;
+        $config->{ $key } = $value;
     }
 
     close $fh;

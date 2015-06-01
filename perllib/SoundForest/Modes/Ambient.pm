@@ -1,6 +1,10 @@
 package SoundForest::Mode::Ambient;
 use base SoundForest::Mode;
+use strict;
+use warnings;
+use 5.10.0;
 use Data::Dump qw(dump);
+my $data = {};
 
 sub new {
     my ( $class, $config ) = @_;
@@ -21,16 +25,18 @@ sub new {
     if ( $config->{fx_chain_enabled} ) {
         system( "$config->{chuck_path} + lib/Modes/Ambient/playFxChain.ck" );
     }
+    $data = $self;
     return $self;
 }
 
 sub process_osc_notifications {
-    my ( $self, $sender, $message ) = @_;
+    my ( $sender, $message ) = @_;
+    my $self = $data;
     my $config = $self->{config};
 
-    if ( $ending ) {
+    if ( $self->{ending} ) {
         if ( $message->[0] eq 'fadeOutComplete' ) {
-            $count = 0;
+            my $count = 0;
 
             if ( $config->{endless_play} ) {
                 print "REINITIALISING\n";
@@ -45,10 +51,10 @@ sub process_osc_notifications {
         }
     }
 
-    if ( $self->end_check() ) {
+    if ( $self->end_check ) {
         # don't do whatever you were going to do, fade out and reinitialise
         # program
-        $ending = 1;
+        $self->{ending} = 1;
         print "FADING OUT\n";
         system( "$config->{chuck_path} + fadeMix.ck" );
         return;
@@ -57,22 +63,22 @@ sub process_osc_notifications {
     # if we aren't already in a restart process or we've
     # discovered we need to kick off a restart process, carry on...
     if ( $message->[0] eq 'playSound' ) {
-        chdir $cwd;
+        chdir $self->{config}{cwd};
 
-        if ( ! @play_sound_files ) {
-            $ending = 1;
-            system( "$config->{chuck_path} + fadeMix.ck" );
+        if ( ! @{ $self->{play_files} } ) {
+            $self->{ending} = 1;
+            system( qq{$config->{chuck_path} + fadeMix.ck"});
         }
         else {
-            my $filename = pop @play_sound_files;
+            my $filename = pop @{ $self->{play_files} };
             print "Got playSound notification, playing $filename\n";
-            system( "$config->{chuck_path} + playSound.ck:" . '"' . $filename . '"');
+            system( qq{$config->{chuck_path} + playSound.ck:"$filename"} );
         }
     }
 
     if ( $message->[0] eq 'playFxChain' ) {
         print "Got playFxChain notification, regenerating\n";
-        system( "$config->{chuck_path} + playFxChain.ck" );
+        system( qq{$self->{config}{chuck_path} + playFxChain.ck});
     }
 }
 
