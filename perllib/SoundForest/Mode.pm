@@ -46,35 +46,34 @@ sub initialise {
     my $bufsize = $config->{bufsize} || 4096;
     my $srate = $config->{srate} || 32000;
 
-
+    # kick off chuck loop vm
     system( "$config->{chuck_path} --loop --srate$srate --bufsize$bufsize &" );
-print "YIKES\n";
+
     # sleeps give time for chuck to initliaise
-    # sleep 1;
+    sleep 1;
     my $mode = ucfirst( $config->{mode} );
 
-    system( qq{ $config->{chuck_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate" & });
-print "DOUBLE YIKES\n";
+    system( qq{ $config->{chuck_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate" });
 
     # as above
-    # sleep 1;
+    sleep 1;
     my $mod_name = "SoundForest::Mode::$mode";
     my $req_name = "perllib/SoundForest/Modes/$mode.pm";
     require "$req_name"; 1;
-    $obj = $mod_name->new( $config );
+    my $obj = $mod_name->new( $config );
     $self->{mode} = $obj;
     $self->start_osc_server;
 }
 
 sub start_osc_server {
     my $self = shift;
-
+ 
     $self->{osc_server} = Net::OpenSoundControl::Server->new(
         Port => 3141,
         Handler => $self->{mode}->can('process_osc_notifications'),
     ) or die "Could not start OSC server: $@\n";
 
-    # $self->{osc_server}->readloop();
+    $self->{osc_server}->readloop();
 }
 
 sub reinitialise {
