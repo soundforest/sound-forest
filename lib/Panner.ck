@@ -98,7 +98,6 @@ public class Panner extends LFO {
             50::ms -=> duration;
             50::ms +=> epoch;
             50::ms => now;
-            <<< val >>>;
         }
     }
 
