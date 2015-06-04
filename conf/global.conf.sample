@@ -1,0 +1,20 @@
+# Path to chuck binary. Defaults to location in Sound Forest package
+chuck_path=./chuck
+
+# Set mode. Default is ambient. See conf/ambient.conf for more configuration options
+mode=ambient
+
+# Tempo (beats per minute)
+bpm=90
+
+# Is this meant to be played on an RPI? May attempt less CPU-intensive work
+rpi=0
+
+# Chuck bufsize parameter
+bufsize=2048
+
+# Chuck samplerate parameter
+srate=44100
+
+# record output to wav file
+record=1
