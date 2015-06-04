@@ -1,4 +1,4 @@
 *.swp
 *.swo
 audio
-*.conf
+conf/*.conf
