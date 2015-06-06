@@ -37,6 +37,7 @@ public class Control {
     static int beatLength;
     static int barLength;
     static int srate;
+    static int record;
 
     static OscSend @ oscSend;
 
@@ -57,8 +58,22 @@ new Gain @=> Control.fxIn;
 Dyno dynoL => dac.left;
 Dyno dynoR => dac.right;
 
+// Set config values
+Std.atof( me.arg(0) ) => Control.bpm;
+Std.atoi( me.arg(1) ) => Control.srate;
+Std.atoi( me.arg(2) ) => Control.record;
+
 WvOut2 wv;
-"sound-forest-output" => wv.autoPrefix;
+
+if ( Control.record ) {
+    "sound-forest-output" => wv.autoPrefix;
+
+    // this is the output file name
+    "special:auto" => wv.wavFilename;
+
+    Control.fxIn => blackhole;
+    dac => wv => blackhole;
+}
 
 dynoL.limit();
 dynoR.limit();
@@ -67,20 +82,11 @@ Control.leftOut => dynoL; // left 'dry' out
 Control.rightOut => dynoR; // right 'dry' out
 
 0.3 => Control.fxIn.gain;
-Control.fxIn => blackhole;
-dac => wv => blackhole;
 
 [ 0, 0 ] @=> Control.sampleActive;
 
-// this is the output file name
-"special:auto" => wv.wavFilename;
-
 new OscSend @=> Control.oscSend;
 Control.oscSend.setHost("localhost", 3141);
-
-// Centralised BPM management
-Std.atof( me.arg(0) ) => Control.bpm;
-Std.atoi( me.arg(1) ) => Control.srate;
 
 ( 60 / Control.bpm ) => float bpmInterval;
 
