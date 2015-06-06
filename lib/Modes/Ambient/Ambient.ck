@@ -21,9 +21,10 @@
 -----------------------------------------------------------------------------*/
 Std.atof( me.arg(0) ) => float bpm;
 Std.atoi( me.arg(1) ) => int srate;
+Std.atoi( me.arg(2) ) => int record;
 me.dir() + "/../.." => string lib_path;
 
-Machine.add(lib_path + "/Control.ck:" + bpm + ":" + srate);
+Machine.add(lib_path + "/Control.ck:" + bpm + ":" + srate + ":" + record);
 Machine.add(lib_path + "/Chooser.ck");
 Machine.add(lib_path + "/LFO.ck");
 Machine.add(lib_path + "/Fader.ck");

@@ -47,13 +47,13 @@ sub initialise {
     my $srate = $config->{srate} || 32000;
 
     # kick off chuck loop vm
-    system( "$config->{chuck_path} --loop --srate$srate --bufsize$bufsize &" );
+    system( qq{$config->{chuck_path} --loop --srate$srate --bufsize$bufsize &} );
 
     # sleeps give time for chuck to initliaise
     sleep 1;
     my $mode = ucfirst( $config->{mode} );
 
-    system( qq{ $config->{chuck_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate" });
+    system( qq{ $config->{chuck_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate":"$config->{record}" });
 
     # as above
     sleep 1;
