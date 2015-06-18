@@ -79,7 +79,7 @@ fader.fadeOut( 10::second, outputPan );
 tearDown();
 
 fun void fxChainBuild() {
-    Chooser.getInt( 1, 21 ) => int choice;
+    Chooser.getInt( 1, 29 ) => int choice;
 
     if ( choice == 1 ) {
         [

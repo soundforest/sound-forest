@@ -38,6 +38,7 @@ public class Control {
     static int barLength;
     static int srate;
     static int record;
+    static int rpi;
 
     static OscSend @ oscSend;
 
@@ -62,6 +63,7 @@ Dyno dynoR => dac.right;
 Std.atof( me.arg(0) ) => Control.bpm;
 Std.atoi( me.arg(1) ) => Control.srate;
 Std.atoi( me.arg(2) ) => Control.record;
+Std.atoi( me.arg(3) ) => Control.rpi;
 
 WvOut2 wv;
 

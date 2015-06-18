@@ -5,18 +5,31 @@ public class FxDownSampler extends Fx {
     fun string idString() { return "FxDownSampler"; }
 
     fun void initialise() {
-        input => down => Gain g => output;
-        0.7 => g.gain;
+        if ( Control.rpi ) {
+            input => output;
+        }
+        else {
+            input => down => Gain g => output;
+            0.7 => g.gain;
+        }
+
         spork ~ activity();
     }
 
 
     fun void activity() {
-        while ( active ) {
-            down.decimate( getDecimation() );
-            down.bittage( c.getInt(6, 12) );
-            c.getInt(0, Control.bpmIntervalsShort.cap() - 1 ) => int intervalChoice;
-            Control.bpmIntervalsShort[ intervalChoice ]::second => now;
+        if ( Control.rpi ) {
+            while ( active ) {
+                down.decimate( getDecimation() );
+                down.bittage( c.getInt(6, 12) );
+                c.getInt(0, Control.bpmIntervalsShort.cap() - 1 ) => int intervalChoice;
+                Control.bpmIntervalsShort[ intervalChoice ]::second => now;
+            }
+        }
+        else {
+            while ( active ) {
+                1::second => now;
+            }
         }
     }
 

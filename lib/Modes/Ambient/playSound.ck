@@ -86,7 +86,8 @@ fun void activity() {
             return;
         }
 
-        if ( c.takeAction( 8 ) ) {
+        // Spare rpis from this until it's been tuned better
+        if ( ! Control.rpi && c.takeAction( 16 ) ) {
             c.getInt( 1, 8 ) => int choice;
 
             if ( choice == 1 ) {

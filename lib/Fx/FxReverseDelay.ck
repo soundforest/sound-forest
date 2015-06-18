@@ -23,22 +23,28 @@
 public class FxReverseDelay extends Fx {
     ( 60.0 / Control.bpm * Control.srate ) $ int => int delaySize;
     ReverseDelay delay;
-    delaySize => delay.delay;
-    input => delay => output;
     Gain feedback;
-    // 0.5 => feedback.gain;
-    Chooser c;
-    c.getInt(0,1) => int doFeedback;
 
-    if ( doFeedback ) {
-        c.getFloat(0.25, 0.75) => feedback.gain;
+    if ( ! Control.rpi ) {
+        delaySize => delay.delay;
+        input => delay => output;
+        Chooser c;
+        c.getInt(0,1) => int doFeedback;
+
+        if ( doFeedback ) {
+            c.getFloat(0.25, 0.75) => feedback.gain;
+        }
+        else {
+            0 => feedback.gain;
+        }
+
+        delay => feedback => input;
+        60.0 / Control.bpm * 1000.0 => float beatInterval; // BI = beat interval in ms;
     }
     else {
-        0 => feedback.gain;
+        // do nothing
+        input => output;
     }
-
-    delay => feedback => input;
-    60.0 / Control.bpm * 1000.0 => float beatInterval; // BI = beat interval in ms;
 
 
     fun string idString() {
@@ -54,7 +60,12 @@ public class FxReverseDelay extends Fx {
             1::second => now;
         }
 
-        input =< delay =< output;
-        delay =< feedback =< input;
+        if ( ! Control.rpi ) {
+            input =< delay =< output;
+            delay =< feedback =< input;
+        }
+        else {
+            input =< delay;
+        }
     }
 }

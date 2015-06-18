@@ -53,7 +53,7 @@ sub initialise {
     sleep 1;
     my $mode = ucfirst( $config->{mode} );
 
-    system( qq{ $config->{chuck_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate":"$config->{record}" });
+    system( qq{ $config->{chuck_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate":"$config->{record}":"$config->{rpi}" });
 
     # as above
     sleep 1;
