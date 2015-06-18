@@ -47,7 +47,7 @@ sub initialise {
     my $srate = $config->{srate} || 32000;
 
     # kick off chuck loop vm
-    system( qq{$config->{chuck_path} --loop --srate$srate --bufsize$bufsize &} );
+    my $pid = system( qq{$config->{chuck_path} --loop --srate$srate --bufsize$bufsize &} );
 
     # sleeps give time for chuck to initliaise
     sleep 1;
@@ -77,9 +77,10 @@ sub start_osc_server {
 }
 
 sub reinitialise {
-    kill_master_pid();
+    my $self = shift;
 
-    initialise();
+    $self->kill_master_pid();
+    $self->initialise();
 }
 
 sub kill_master_pid {

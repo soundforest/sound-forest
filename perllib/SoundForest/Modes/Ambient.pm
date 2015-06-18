@@ -40,7 +40,11 @@ sub process_osc_notifications {
 
             if ( $config->{endless_play} ) {
                 print "REINITIALISING\n";
-                reinitialise();
+                $self->reinitialise();
+            }
+            else {
+                say "EXITING";
+                exit;
             }
         }
         else {
@@ -56,7 +60,7 @@ sub process_osc_notifications {
         # program
         $self->{ending} = 1;
         print "FADING OUT\n";
-        system( "$config->{chuck_path} + fadeMix.ck" );
+        system( qq{$config->{chuck_path} + fadeMix.ck} );
         return;
     }
 
@@ -67,7 +71,7 @@ sub process_osc_notifications {
 
         if ( ! @{ $self->{play_files} } ) {
             $self->{ending} = 1;
-            system( qq{$config->{chuck_path} + fadeMix.ck"});
+            system( qq{$config->{chuck_path} + fadeMix.ck});
         }
         else {
             my $filename = pop @{ $self->{play_files} };
