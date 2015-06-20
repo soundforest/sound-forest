@@ -12,18 +12,19 @@ sub new {
     bless $self, $class;
     $self->{config} = $config;
     $self->{play_files} = $self->get_files_list( $config->{play_sounds_path} );
+    $self->{libpath} = 'lib/Modes/Ambient';
 
     my $count = 0;
 
     while ( $count < $config->{play_sounds} ) {
         my $filename = pop @{ $self->{play_files} };
         print "playSound playing $filename\n";
-        system( "$config->{chuck_path} + lib/Modes/Ambient/playSound.ck:" . '"' . $filename . '"');
+        system( "$config->{chuck_path} + $self->{libpath}/playSound.ck:" . '"' . $filename . '"');
         $count++;
     }
 
     if ( $config->{fx_chain_enabled} ) {
-        system( "$config->{chuck_path} + lib/Modes/Ambient/playFxChain.ck" );
+        system( "$config->{chuck_path} + $self->{libpath}/playFxChain.ck" );
     }
     $data = $self;
     return $self;
@@ -76,13 +77,13 @@ sub process_osc_notifications {
         else {
             my $filename = pop @{ $self->{play_files} };
             print "Got playSound notification, playing $filename\n";
-            system( qq{$config->{chuck_path} + playSound.ck:"$filename"} );
+            system( qq{$config->{chuck_path} + $self->{libpath}/playSound.ck:"$filename"} );
         }
     }
 
     if ( $message->[0] eq 'playFxChain' ) {
         print "Got playFxChain notification, regenerating\n";
-        system( qq{$self->{config}{chuck_path} + playFxChain.ck});
+        system( qq{$self->{config}{chuck_path} + $self->{libpath}/playFxChain.ck});
     }
 }
 
