@@ -79,7 +79,14 @@ fader.fadeOut( 10::second, outputPan );
 tearDown();
 
 fun void fxChainBuild() {
-    Chooser.getInt( 1, 29 ) => int choice;
+    int choice;
+
+    if ( Control.rpi ) {
+        Chooser.getInt( 1, 12 ) => choice;
+    }
+    else {
+        Chooser.getInt( 1, 29 ) => choice;
+    }
 
     if ( choice == 1 ) {
         [
@@ -90,30 +97,28 @@ fun void fxChainBuild() {
 
     if ( choice == 2 ) {
         [
-            new FxDownSampler,
+            new FxDelayVariable,
             new FxDelay
         ] @=> fxChain;
     }
 
     if ( choice == 3 ) {
         [
-            new FxDownSampler,
-            new FxFilter,
-            new FxDelay
+            new FxDelay,
+            new FxHarmonicDelay
         ] @=> fxChain;
     }
 
     if ( choice == 4 ) {
         [
-            new FxDownSampler,
-            new FxDelay,
-            new FxFlanger
+            new FxHarmonicDelay,
+            new FxDelay
         ] @=> fxChain;
     }
 
     if ( choice == 5 ) {
         [
-            new FxDelayVariable,
+            new FxFlanger,
             new FxDelay
         ] @=> fxChain;
     }
@@ -141,124 +146,53 @@ fun void fxChainBuild() {
 
     if ( choice == 9 ) {
         [
-            new FxDownSampler,
-            new FxDelayVariable
-        ] @=> fxChain;
-    }
-
-    if ( choice == 10 ) {
-        [
-            new FxDownSampler,
-            new FxFilter,
-            new FxDelayVariable
-        ] @=> fxChain;
-    }
-
-    if ( choice == 11 ) {
-        [
-            new FxGate,
-            new FxFilter,
-            new FxDelayVariable
-        ] @=> fxChain;
-    }
-
-    if ( choice == 12 ) {
-        [
-            new FxDownSampler,
-            new FxDelayVariable
-        ] @=> fxChain;
-    }
-
-    if ( choice == 13 ) {
-        [
-            new FxReverseDelay,
-            new FxDelayVariable
-        ] @=> fxChain;
-    }
-
-    if ( choice == 14 ) {
-        [
-            new FxGate,
-            new FxDelayVariable,
-            new FxReverseDelay
-        ] @=> fxChain;
-    }
-
-    if ( choice == 15 ) {
-        [
-            new FxDelayVariable,
-            new FxReverseDelay
-        ] @=> fxChain;
-    }
-
-    if ( choice == 16 ) {
-        [
-            new FxFlanger,
-            new FxReverseDelay
-        ] @=> fxChain;
-    }
-
-    if ( choice == 17 ) {
-        [
-            new FxFilter,
-            new FxReverseDelay
-        ] @=> fxChain;
-    }
-
-    if ( choice == 18 ) {
-        [
-            new FxGate,
-            new FxReverseDelay
-        ] @=> fxChain;
-    }
-
-    if ( choice == 19 ) {
-        [
-            new FxDownSampler,
-            new FxReverseDelay
-        ] @=> fxChain;
-    }
-
-    if ( choice == 20 ) {
-        [
-            new FxDownSampler,
-            new FxFilter,
-            new FxReverseDelay
-        ] @=> fxChain;
-    }
-
-    if ( choice == 21 ) {
-        [
-            new FxGate,
-            new FxFilter,
-            new FxReverseDelay
-        ] @=> fxChain;
-    }
-
-    if ( choice == 22 ) {
-        [
-            new FxDownSampler,
-            new FxReverseDelay
-        ] @=> fxChain;
-    }
-
-
-    if ( choice == 23 ) {
-        [
             new FxDelay,
             new FxReverb,
             new FxChorus
         ] @=> fxChain;
     }
 
-    if ( choice == 24 ) {
+    if ( choice == 10 ) {
+        [
+            new FxDelay,
+            new FxFilter,
+            new FxReverb
+        ] @=> fxChain;
+    }
+
+    if ( choice == 11 ) {
+        [
+            new FxDelay,
+            new FxFlanger,
+            new FxReverb
+        ] @=> fxChain;
+    }
+
+    if ( choice == 12 ) {
+        [
+            new FxDelayVariable,
+            new FxDelay
+        ] @=> fxChain;
+    }
+
+    // Beyond here all choices are for Control.rpi == 0 only
+    if ( choice == 13 ) {
+        [
+            new FxDelay,
+            new FxDownSampler,
+            new FxFilter,
+            new FxReverb
+        ] @=> fxChain;
+    }
+
+    if ( choice == 14 ) {
         [
             new FxDelay,
             new FxDownSampler
         ] @=> fxChain;
     }
 
-    if ( choice == 25 ) {
+    if ( choice == 15 ) {
         [
             new FxDownSampler,
             new FxDelay,
@@ -266,36 +200,103 @@ fun void fxChainBuild() {
         ] @=> fxChain;
     }
 
-    if ( choice == 26 ) {
+    if ( choice == 16 ) {
         [
             new FxDelay,
             new FxDownSampler,
             new FxReverb
+        ] @=> fxChain;
+    }
+
+    if ( choice == 17 ) {
+        [
+            new FxDownSampler,
+            new FxDelayVariable
+        ] @=> fxChain;
+    }
+
+    if ( choice == 18 ) {
+        [
+            new FxDelayVariable,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 19 ) {
+        [
+            new FxGate,
+            new FxDelayVariable,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 20 ) {
+        [
+            new FxDelayVariable,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 21 ) {
+        [
+            new FxFlanger,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 22 ) {
+        [
+            new FxFilter,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 23 ) {
+        [
+            new FxGate,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 24 ) {
+        [
+            new FxDownSampler,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 25 ) {
+        [
+            new FxDownSampler,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+    if ( choice == 26 ) {
+        [
+            new FxDownSampler,
+            new FxDelayVariable
         ] @=> fxChain;
     }
 
     if ( choice == 27 ) {
         [
-            new FxDelay,
-            new FxFilter,
-            new FxReverb
+            new FxDownSampler,
+            new FxDelayVariable
         ] @=> fxChain;
     }
 
     if ( choice == 28 ) {
         [
-            new FxDelay,
             new FxDownSampler,
-            new FxFilter,
-            new FxReverb
+            new FxDelay
         ] @=> fxChain;
     }
 
     if ( choice == 29 ) {
         [
+            new FxDownSampler,
             new FxDelay,
-            new FxFlanger,
-            new FxReverb
+            new FxFlanger
         ] @=> fxChain;
     }
 
