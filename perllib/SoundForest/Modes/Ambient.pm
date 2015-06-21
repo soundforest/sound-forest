@@ -44,6 +44,7 @@ sub process_osc_notifications {
                 $self->reinitialise();
             }
             else {
+                $self->kill_master_pid();
                 say "EXITING";
                 exit;
             }
