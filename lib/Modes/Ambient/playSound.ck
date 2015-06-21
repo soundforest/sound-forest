@@ -73,6 +73,7 @@ fun void activity() {
     // define convenient threshold for checking if we should bail
     // for fadeout
     buf.length() - fadeTime => dur activityEnd;
+
     while ( buf.pos()::samp < activityEnd ) {
         c.getDur(5, 9) => dur duration;
 
@@ -86,9 +87,16 @@ fun void activity() {
             return;
         }
 
-        // Spare rpis from this until it's been tuned better
-        if ( ! Control.rpi && c.takeAction( 16 ) ) {
-            c.getInt( 1, 8 ) => int choice;
+        if ( c.takeAction( 16 ) ) {
+            int choice;
+
+            // rpis should be spared the chugens
+            if ( Control.rpi ) {
+                c.getInt( 1, 6 ) => choice;
+            }
+            else {
+                c.getInt( 1, 8 ) => choice;
+            }
 
             if ( choice == 1 ) {
                 if ( buf.pos()::samp - duration > 0::second ) {
@@ -144,11 +152,11 @@ fun void effecto( dur duration, int choice ) {
     }
 
     if ( choice == 6 ) {
-        new FxDownSampler @=> effect;
+        new FxReverb @=> effect;
     }
 
     if ( choice == 7 ) {
-        new FxReverb @=> effect;
+        new FxDownSampler @=> effect;
     }
 
     if ( choice == 8 ) {
