@@ -21,10 +21,16 @@
 -----------------------------------------------------------------------------*/
 
 public class FxReverb extends Fx {
-    // need to go with JCRev sadly
-    // ( no disrespect to John Chowning )
-    // to save some cycles on the pi
-    JCRev rev;
+    UGen rev;
+
+    if ( Control.rpi ) {
+        new JCRev @=> rev;
+    }
+    else {
+        // Use something gruntier if pi not being used
+        new NRev @=> rev;
+    }
+
     input => rev => output;
 
     fun string idString() { return "FxReverb"; }
