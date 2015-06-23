@@ -92,10 +92,10 @@ fun void activity() {
 
             // rpis should be spared the chugens
             if ( Control.rpi ) {
-                c.getInt( 1, 6 ) => choice;
+                c.getInt( 1, 7 ) => choice;
             }
             else {
-                c.getInt( 1, 8 ) => choice;
+                c.getInt( 1, 9 ) => choice;
             }
 
             if ( choice == 1 ) {
@@ -130,7 +130,19 @@ fun void activity() {
                 duration => now;
             }
 
-            if ( choice > 3 ) {
+            if ( choice == 4 ) {
+                duration / 4 => now;
+                duration / 8 => now;
+
+                slideRate( "down" , duration / 16 );
+
+                duration / 4 => now;
+
+                slideRate( "up" , duration / 16 );
+                duration / 4 => now;
+            }
+
+            if ( choice > 4 ) {
                 effecto(duration, choice);
             }
         }
@@ -227,6 +239,34 @@ fun void reepeat() {
     setRate( 1 );
 
     f.fadeInBlocking( miniFadeTime, 0.8, buf );
+}
+
+fun void slideRate( string type, dur slideTime ) {
+    slideTime / 100 => dur timeIncrement;
+
+    1 / 100.0 => float rateIncrement;
+
+    1 => float endRate;
+
+    if ( type == "down" ) {
+        0 => endRate;
+    }
+
+    float currRate;
+
+    while ( slideTime > 0::second ) {
+        buf.rate() => currRate;
+
+        if ( type == "up" ) {
+            setRate( currRate + rateIncrement );
+        }
+        else {
+            setRate( currRate - rateIncrement );
+        }
+<<< buf.rate(), rateIncrement >>>;
+        timeIncrement => now;
+        timeIncrement -=> slideTime;
+    }
 }
 
 // While developing this I want to tune the amount of reversing that
