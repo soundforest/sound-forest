@@ -75,9 +75,13 @@ fun void activity() {
     buf.length() - fadeTime => dur activityEnd;
 
     while ( buf.pos()::samp < activityEnd ) {
-        c.getDur(5, 9) => dur duration;
+        // divvy up time in chunks relative to Control.bpm
+        // and determine if we want to do something with them
+        Control.beatDur * c.getInt(16, 32) => dur duration;
 
-        // return so we can fade out now
+        // if duration takes us beyond length of buf
+        // play whatever we can and then return so
+        // we can fade out
         if (
             buf.pos()::samp + duration > buf.length() ||
             buf.pos()::samp + duration > activityEnd
@@ -87,19 +91,22 @@ fun void activity() {
             return;
         }
 
+        // still here?
+        // every so often we want to do something to the signal
+        // just to vary things up a bit
         if ( c.takeAction( 16 ) ) {
             int choice;
 
             // rpis should be spared the chugens
             if ( Control.rpi ) {
-                c.getInt( 1, 7 ) => choice;
+                c.getInt( 1, 8 ) => choice;
             }
             else {
-                c.getInt( 1, 9 ) => choice;
+                c.getInt( 1, 10 ) => choice;
             }
 
             if ( choice == 1 ) {
-                if ( buf.pos()::samp - duration > 0::second ) {
+               if ( buf.pos()::samp - duration > 0::second ) {
                     reverse( duration );
                 }
                 else {
@@ -131,18 +138,28 @@ fun void activity() {
             }
 
             if ( choice == 4 ) {
-                duration / 4 => now;
-                duration / 8 => now;
+                dur leftoverdur;
+                int denominator;
 
-                slideRate( "down" , duration / 16 );
+                c.getInt( 4, 16 ) => denominator;
+                slideRate( "down" , duration / denominator );
+                duration - ( duration / denominator ) => leftoverdur;
+                c.getInt( 4, 8 ) => denominator;
+                duration / denominator => now;
+                leftoverdur - ( duration / denominator ) => leftoverdur;
 
-                duration / 4 => now;
+                c.getInt( 4, 16 ) => denominator;
+                slideRate( "up" , duration / denominator );
+                leftoverdur - ( duration / denominator ) => leftoverdur;
 
-                slideRate( "up" , duration / 16 );
-                duration / 4 => now;
+                leftoverdur => now; // should all add up to duration
             }
 
-            if ( choice > 4 ) {
+            if ( choice == 5 ) {
+               xeno( duration );
+            }
+
+            if ( choice > 5 ) {
                 effecto(duration, choice);
             }
         }
@@ -155,26 +172,27 @@ fun void activity() {
 fun void effecto( dur duration, int choice ) {
     Fx effect;
 
-    if ( choice == 4 ) {
-        new FxFlanger @=> effect;
-    }
-
-    if ( choice == 5 ) {
-        new FxDelayVariable @=> effect;
-    }
-
     if ( choice == 6 ) {
         new FxReverb @=> effect;
     }
 
     if ( choice == 7 ) {
-        new FxDownSampler @=> effect;
+        new FxFlanger @=> effect;
     }
 
     if ( choice == 8 ) {
+        new FxDelayVariable @=> effect;
+    }
+
+    // the following not invoked if Control.rpi
+    if ( choice == 9 ) {
         new FxReverseDelay @=> effect;
     }
-    // effects[ choice ] @=> Fx effect;
+
+    if ( choice == 10 ) {
+        new FxDownSampler @=> effect;
+    }
+
     <<< "EFFECTING", filepath, effect.idString() >>>;
     buf => effect.input;
     effect.output => Pan2 fpan;
@@ -263,9 +281,24 @@ fun void slideRate( string type, dur slideTime ) {
         else {
             setRate( currRate - rateIncrement );
         }
-<<< buf.rate(), rateIncrement >>>;
+
         timeIncrement => now;
         timeIncrement -=> slideTime;
+    }
+}
+
+fun void xeno( dur durdur ) {
+    durdur / 12 => durdur;
+
+    while ( durdur > 1::samp ) {
+        durdur => now;
+        buf.rate( -1 );
+
+        // the following values are arbitrary TODO: something more asymptotic
+        durdur * ( 5.0 / 6.0 ) => dur newdur;
+        newdur => now;
+        newdur => durdur;
+        buf.rate( 1 );
     }
 }
 
