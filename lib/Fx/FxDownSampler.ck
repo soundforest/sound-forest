@@ -20,15 +20,15 @@ public class FxDownSampler extends Fx {
     fun void activity() {
         if ( Control.rpi ) {
             while ( active ) {
-                down.decimate( getDecimation() );
-                down.bittage( c.getInt(6, 12) );
-                c.getInt(0, Control.bpmIntervalsShort.cap() - 1 ) => int intervalChoice;
-                Control.bpmIntervalsShort[ intervalChoice ]::second => now;
+                1::second => now;
             }
         }
         else {
             while ( active ) {
-                1::second => now;
+                down.decimate( getDecimation() );
+                down.bittage( c.getInt(6, 12) );
+                c.getInt(0, Control.bpmIntervalsShort.cap() - 1 ) => int intervalChoice;
+                Control.bpmIntervalsShort[ intervalChoice ]::second => now;
             }
         }
     }
