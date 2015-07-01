@@ -24,10 +24,11 @@ public class FxHarmonicDelay extends Fx {
     Delay delay;
     Chooser c;
     LFO lfo;
-    input => delay => output;
+    input => delay => Gain g => output;
     Gain feedback;
     delay => feedback;
     feedback => input;
+    0.8 => g.gain;
     c.getInt( 0, 1 ) => int doOscFeedback;
     ( 1 / c.getIntervalLong() ) => float oscFeedbackFreq;
 
