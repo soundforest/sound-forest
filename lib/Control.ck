@@ -32,6 +32,7 @@ public class Control {
     static int sampleActive[];
     static float bpm;
     static float bpmIntervalsShort[];
+    static float bpmIntervalsMedium[];
     static float bpmIntervalsLong[];
     static dur beatDur;
     static int beatLength;
@@ -105,6 +106,18 @@ Control.oscSend.setHost("localhost", 3141);
      bpmInterval * 2,
      bpmInterval * ( 5.0 / 2.0 )
 ] @=> Control.bpmIntervalsShort;
+
+[
+    bpmInterval / 4 * 3, // 3 quavers
+    bpmInterval,
+    bpmInterval * ( 4.0 / 3.0 ),
+    bpmInterval * 1.5,
+    bpmInterval * ( 5.0 / 3.0 ),
+    bpmInterval * 2.0,
+    bpmInterval * 2.5,
+    bpmInterval * 3.0,
+    bpmInterval * 4.0
+] @=> Control.bpmIntervalsMedium;
 
 [
      bpmInterval * 4,     // 1 'bar'

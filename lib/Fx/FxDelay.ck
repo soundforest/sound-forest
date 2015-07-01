@@ -30,22 +30,34 @@ public class FxDelay extends Fx {
     60.0 / Control.bpm * 1000.0 => float beatInterval; // BI = beat interval in ms;
 
     // select a few interesting delay values
-    Control.bpmIntervalsShort @=> float delayIntervals[];
+    Control.bpmIntervalsMedium @=> float delayIntervals[];
 
     fun string idString() {
         return "FxDelay";
     }
 
+    fun float getDelayLength() {
+        chooser.getInt( 0, delayIntervals.cap() - 1 ) => int targetDelay;
+
+        // determine if delay value greater than 2 second limit on Delay size
+        if ( delayIntervals[ targetDelay ] > 2 ) {
+            // it is, so try again
+            return getDelayLength();
+        }
+        else {
+            // return what we found
+            return delayIntervals[ targetDelay ] * 1000; // convert to ms
+        }
+    }
+
     fun void initialise() {
         1 => active;
-        chooser.getInt( 0, delayIntervals.cap() - 1 ) => int targetDelay;
-        delayIntervals[ targetDelay ] * 1000 => float delayLength;
+        getDelayLength() => float delayLength;
 
-        2000 => int delayMax;
         chooser.getFloat( 0.4, 0.7 ) => float delayMix;
-        <<< "   FxDelay: delayLength", delayLength, "delayMax", delayMax, "delayMix", delayMix >>>;
+        <<< "   FxDelay: delayLength", delayLength, "delayMix", delayMix >>>;
 
-        delayMax::ms => delay.max;
+        delayLength::ms => delay.max;
         delayLength::ms => delay.delay;
         delayMix => feedback.gain;
         spork ~ activity();
