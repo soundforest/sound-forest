@@ -33,18 +33,6 @@ Pan2 outputPan;
 // spork ~ panner.initialise(outputPan);
 Fx @ fxChain[];
 
-// [
-//      new FxDelay,
-//      new FxFilter,
-//      new FxChorus,
-//      new FxReverb,
-//      new FxFlanger,
-//      new FxDelayVariable,
-//      new FxHarmonicDelay,
-//      new FxDownSampler,
-//      new FxReverseDelay
-// ] @=> Fx fxBattery[];
-
 UGen outLeft, outRight;
 
 outLeft => Control.leftOut;
