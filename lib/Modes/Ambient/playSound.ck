@@ -94,15 +94,15 @@ fun void activity() {
         // still here?
         // every so often we want to do something to the signal
         // just to vary things up a bit
-        if ( c.takeAction( 16 ) ) {
+        if ( c.takeAction( 8 ) ) {
             int choice;
 
             // rpis should be spared the chugens
             if ( Control.rpi ) {
-                c.getInt( 1, 8 ) => choice;
+                c.getInt( 1, 10 ) => choice;
             }
             else {
-                c.getInt( 1, 10 ) => choice;
+                c.getInt( 1, 12 ) => choice;
             }
 
             if ( choice == 1 ) {
@@ -159,7 +159,11 @@ fun void activity() {
                xeno( duration );
             }
 
-            if ( choice > 5 ) {
+            if ( choice == 6 ) {
+                dawdle( duration );
+            }
+
+            if ( choice > 6 ) {
                 effecto(duration, choice);
             }
         }
@@ -172,24 +176,28 @@ fun void activity() {
 fun void effecto( dur duration, int choice ) {
     Fx effect;
 
-    if ( choice == 6 ) {
+    if ( choice == 7 ) {
         new FxReverb @=> effect;
     }
 
-    if ( choice == 7 ) {
+    if ( choice == 8 ) {
         new FxFlanger @=> effect;
     }
 
-    if ( choice == 8 ) {
+    if ( choice == 9 ) {
         new FxDelayVariable @=> effect;
     }
 
+    if ( choice == 10 ) {
+        new FxDelay @=> effect;
+    }
+
     // the following not invoked if Control.rpi
-    if ( choice == 9 ) {
+    if ( choice == 11 ) {
         new FxReverseDelay @=> effect;
     }
 
-    if ( choice == 10 ) {
+    if ( choice == 12 ) {
         new FxDownSampler @=> effect;
     }
 
@@ -300,6 +308,41 @@ fun void xeno( dur durdur ) {
         newdur => durdur;
         buf.rate( 1 );
     }
+}
+
+// Make playback run slower by oscillating back and forth
+fun void dawdle( dur duration ) {
+    1 => float direction;
+
+    [ 2, 3, 4, 5, 5, 7, 9, 10 ] @=> int forwardRatios[];
+    [ 1, 1, 1, 1, 2, 2, 2, 3  ] @=> int backwardRatios[];
+
+    100::samp => dur fadeDur;
+    buf.gain() => float origGain;
+    dur stepDur;
+
+    while ( duration > stepDur ) {
+        c.getInt( 0, forwardRatios.cap() - 1 ) => int choice;
+        forwardRatios[ choice ] => int forwardRatio;
+        backwardRatios[ choice ] => int backwardRatio;
+        <<< "dawdling", forwardRatio, "forward,", backwardRatio, "back" >>>;
+        Control.beatDur / 16 => dur dur64;
+        dur64 * forwardRatio => dur forwardDur;
+
+        dur64 / samp => float dur64samples;
+        dur64samples $int * backwardRatio $ int => int backwardSamples;
+
+        f.fadeOutBlocking( fadeDur, buf );
+
+        f.fadeIn( fadeDur, origGain, buf );
+
+        forwardDur - fadeDur => now;
+        f.fadeOutBlocking( fadeDur, buf );
+        buf.pos() - backwardSamples => buf.pos;
+        forwardDur -=> duration;
+    }
+
+    f.fadeInBlocking( fadeDur, origGain, buf );
 }
 
 // While developing this I want to tune the amount of reversing that
