@@ -77,7 +77,8 @@ fun void activity() {
     while ( buf.pos()::samp < activityEnd ) {
         // divvy up time in chunks relative to Control.bpm
         // and determine if we want to do something with them
-        Control.beatDur * c.getInt(16, 32) => dur duration;
+        // Vary length between 3 and 6 bars
+        Control.beatDur * 4 * c.getInt(3, 6) => dur duration;
 
         // if duration takes us beyond length of buf
         // play whatever we can and then return so
@@ -92,85 +93,70 @@ fun void activity() {
         }
 
         // still here?
-        // every so often we want to do something to the signal
-        // just to vary things up a bit
+        // shall we do randomly do anything to the signal?
         if ( c.takeAction( 8 ) ) {
-            int choice;
-
-            // rpis should be spared the chugens
-            if ( Control.rpi ) {
-                c.getInt( 1, 10 ) => choice;
-            }
-            else {
-                c.getInt( 1, 12 ) => choice;
-            }
-
-            if ( choice == 1 ) {
-               if ( buf.pos()::samp - duration > 0::second ) {
-                    reverse( duration );
-                }
-                else {
-                    // pick something else then
-                    c.getInt( 2, 8 ) => choice;
-                }
-            }
-
-            if ( choice == 2 ) {
-                reepeat();
-            }
-
-            if ( choice == 3 ) {
-                p.pan.pan() => float oldPan;
-                Std.fabs( oldPan ) => float amount;
-
-                if ( amount > 0.3 ) {
-                    <<< "PANNING", filepath, oldPan >>>;
-                    1 => p.active;
-                    spork ~ p.panFromFixed( c.getFloat( 0, 1 ), oldPan, "sine", duration );
-                    0 => p.active;
-                    oldPan => p.pan.pan;
-                }
-                else {
-                    c.getFloat( -1.0, 1.0 ) => p.pan.pan;
-                }
-
-                duration => now;
-            }
-
-            if ( choice == 4 ) {
-                dur leftoverdur;
-                int denominator;
-
-                c.getInt( 4, 16 ) => denominator;
-                slideRate( "down" , duration / denominator );
-                duration - ( duration / denominator ) => leftoverdur;
-                c.getInt( 4, 8 ) => denominator;
-                duration / denominator => now;
-                leftoverdur - ( duration / denominator ) => leftoverdur;
-
-                c.getInt( 4, 16 ) => denominator;
-                slideRate( "up" , duration / denominator );
-                leftoverdur - ( duration / denominator ) => leftoverdur;
-
-                leftoverdur => now; // should all add up to duration
-            }
-
-            if ( choice == 5 ) {
-               xeno( duration );
-            }
-
-            if ( choice == 6 ) {
-                dawdle( duration );
-            }
-
-            if ( choice > 6 ) {
-                effecto(duration, choice);
-            }
+            alterSignal( duration );
         }
         else {
             duration => now;
         }
     }
+}
+
+// We've decided to do something random to the signal
+// This function determines what that is
+fun void alterSignal( dur duration ) {
+    getAction( 1 ) => int choice;
+
+    // first choices involve manipulating SndBuf playback
+    if ( choice == 1 ) {
+       if ( buf.pos()::samp - duration > 0::second ) {
+            reverse( duration );
+        }
+        else {
+            // pick something else then
+            getAction( 2 ) => int choice;
+        }
+    }
+
+    if ( choice == 2 ) {
+        reepeat();
+    }
+
+    if ( choice == 3 ) {
+        makeSlide( duration );
+    }
+
+    if ( choice == 4 ) {
+       xeno( duration );
+    }
+
+    if ( choice == 5 ) {
+        dawdle( duration );
+    }
+
+    if ( choice == 6 ) {
+        panBuf( duration );
+    }
+
+    // all other choices involve applying Fx modules
+    if ( choice > 6 ) {
+        effecto(duration, choice);
+    }
+}
+
+// Generate choice integer for action
+fun int getAction( int startInt ) {
+    // size of choices limited by config rpi setting
+    12 => int endInt;
+
+    if ( Control.rpi ) {
+        10 => endInt;
+    }
+
+    c.getInt( startInt, endInt ) => int choice;
+
+    return choice;
 }
 
 fun void effecto( dur duration, int choice ) {
@@ -226,6 +212,24 @@ fun void effecto( dur duration, int choice ) {
     <<< "UNEFFECTING", filepath, effect.idString() >>>;
 }
 
+fun void panBuf ( dur duration ) {
+    p.pan.pan() => float oldPan;
+    Std.fabs( oldPan ) => float amount;
+
+    if ( amount > 0.3 ) {
+        <<< "PANNING", filepath, oldPan >>>;
+        1 => p.active;
+        spork ~ p.panFromFixed( c.getFloat( 0, 1 ), oldPan, "sine", duration );
+        0 => p.active;
+        oldPan => p.pan.pan;
+    }
+    else {
+        c.getFloat( -1.0, 1.0 ) => p.pan.pan;
+    }
+
+    duration => now;
+}
+
 fun void reverse( dur duration) {
     reverseMessage( "REVERSING", duration );
     setRate( -1.0 );
@@ -265,6 +269,24 @@ fun void reepeat() {
     setRate( 1 );
 
     f.fadeInBlocking( miniFadeTime, 0.8, buf );
+}
+
+fun void makeSlide( dur duration ) {
+    dur leftoverdur;
+    int denominator;
+
+    c.getInt( 4, 16 ) => denominator;
+    slideRate( "down" , duration / denominator );
+    duration - ( duration / denominator ) => leftoverdur;
+    c.getInt( 4, 8 ) => denominator;
+    duration / denominator => now;
+    leftoverdur - ( duration / denominator ) => leftoverdur;
+
+    c.getInt( 4, 16 ) => denominator;
+    slideRate( "up" , duration / denominator );
+    leftoverdur - ( duration / denominator ) => leftoverdur;
+
+    leftoverdur => now; // should all add up to duration
 }
 
 fun void slideRate( string type, dur slideTime ) {
