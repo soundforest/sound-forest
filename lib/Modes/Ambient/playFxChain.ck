@@ -54,16 +54,16 @@ else {
 }
 
 fxChainBuild();
+[ 8, 16, 24, 32 ] @=> int bars[];
 
-Chooser.getDur( 90, 120 ) => dur fxTime;
+bars[ chooser.getInt( 0, bars.cap() - 1 ) ] => int choice;
 
-fader.fadeIn( 10::second, 0.7, outputPan );
-fxTime - ( 2 * 10::second ) => now;
+Control.barDur * choice => dur fxTime;
+2 * Control.barDur => dur fadeTime;
+fader.fadeIn( fadeTime, 0.7, outputPan );
+fxTime - fadeTime=> now;
 
-// fader now sporks its own fadeout (cleaner) so we need to keep time
-// ourselves
-fader.fadeOut( 10::second, outputPan );
-10::second => now;
+fader.fadeOutBlocking( fadeTime, outputPan );
 tearDown();
 
 fun void fxChainBuild() {
