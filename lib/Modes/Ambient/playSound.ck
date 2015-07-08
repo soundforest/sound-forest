@@ -31,40 +31,76 @@ Panner p;
 Chooser c;
 me.arg(0) => string filepath;
 
-// use PainGain's gain by default
-0.9 => p.pan.gain;
-
 // set up buf
 512 => buf.chunks;
 filepath => buf.read;
 
-buf => p.pan;
+SndBuf buf2;
 
-p.pan.left => Control.leftOut;
-p.pan.right => Control.rightOut;
+if ( buf.channels() == 1 ) {
+    buf => p.pan;
 
-// send buf to fx
-// could make this conditional
-buf => Control.fxIn;
-c.getFloat( -1.0, 1.0 ) => p.pan.pan;
+    p.pan.left => Control.leftOut;
+    p.pan.right => Control.rightOut;
 
-buf.length() / 10 => dur fadeTime;
+    // send buf to fx
+    // could make this conditional
+    buf => Control.fxIn;
+    c.getFloat( -1.0, 1.0 ) => p.pan.pan;
+}
+else {
+    filepath => buf2.read;
+    1 => buf2.channel;
+
+    // swap channels half the time
+    if ( c.getInt( 0, 1 ) ) {
+        buf => Control.leftOut;
+        buf2 => Control.rightOut;
+    }
+    else {
+        buf2 => Control.leftOut;
+        buf => Control.rightOut;
+    }
+    buf => Control.fxIn;
+    buf2 => Control.fxIn;
+}
+
+2 * Control.barDur => dur fadeTime;
 
 0 => buf.gain;
 
 <<< "Playing", filepath >>>;
 
-f.fadeInBlocking( fadeTime, 0.8, buf );
 
-activity();
+if ( buf.channels() == 1 ) {
+    f.fadeInBlocking( fadeTime, 0.8, buf );
+    activity();
+    f.fadeOutBlocking( fadeTime, buf );
+}
+else {
+    f.fadeIn( fadeTime, 0.8, buf );
+    f.fadeIn( fadeTime, 0.8, buf2 );
+    buf.length() - fadeTime => now;
+    f.fadeOut( fadeTime, buf );
+    f.fadeOut( fadeTime, buf2 );
+    fadeTime => now;
+}
 
-f.fadeOutBlocking( fadeTime, buf );
 
 // disconnect
-buf =< p.pan;
+if ( buf.channels() == 1 ) {
+    buf =< p.pan;
+}
+else {
+    buf =< Control.leftOut;
+    buf2 =< Control.rightOut;
+}
+
 p.pan.left =< Control.leftOut;
 p.pan.right =< Control.rightOut;
 Control.barLength::samp * 2 => now;
+
+
 Control.oscSend.startMsg("playSound", "i");
 
 1 => Control.oscSend.addInt;

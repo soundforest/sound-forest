@@ -35,6 +35,7 @@ public class Control {
     static float bpmIntervalsMedium[];
     static float bpmIntervalsLong[];
     static dur beatDur;
+    static dur barDur;
     static int beatLength;
     static int barLength;
     static int srate;
@@ -133,6 +134,7 @@ Control.oscSend.setHost("localhost", 3141);
 ] @=> Control.bpmIntervalsLong;
 
 bpmInterval::second => Control.beatDur;
+Control.beatDur * 4 => Control.barDur;
 ( bpmInterval * Control.srate ) $ int => Control.beatLength;
 ( Control.beatLength * 4 ) => Control.barLength;
 
