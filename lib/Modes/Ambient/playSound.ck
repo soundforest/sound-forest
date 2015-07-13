@@ -184,7 +184,7 @@ fun void alterSignal( dur duration ) {
 // Generate choice integer for action
 fun int getAction( int startInt ) {
     // size of choices limited by config rpi setting
-    12 => int endInt;
+    13 => int endInt;
 
     if ( Control.rpi ) {
         10 => endInt;
@@ -221,6 +221,10 @@ fun void effecto( dur duration, int choice ) {
 
     if ( choice == 12 ) {
         new FxDownSampler @=> effect;
+    }
+
+    if ( choice == 13 ) {
+        new FxRingMod @=> effect;
     }
 
     <<< "EFFECTING", filepath, effect.idString() >>>;
