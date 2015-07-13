@@ -32,7 +32,7 @@ public class FxHarmonicDelay extends Fx {
     c.getInt( 0, 1 ) => int doOscFeedback;
     ( 1 / c.getIntervalLong() ) => float oscFeedbackFreq;
 
-    60.0 / Control.bpm * 1000.0 => float beatInterval; // BI = beat interval in ms;
+    ( Control.bpm / 60 ) * 1000.0 => float beatInterval; // BI = beat interval in ms;
 
     [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 37 ] @=> int midiNotes[];
 
