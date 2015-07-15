@@ -78,6 +78,7 @@ if ( buf.channels() == 1 ) {
     f.fadeOutBlocking( fadeTime, buf );
 }
 else {
+    0 => buf2.gain;
     f.fadeIn( fadeTime, 0.8, buf );
     f.fadeIn( fadeTime, 0.8, buf2 );
     buf.length() - fadeTime => now;
