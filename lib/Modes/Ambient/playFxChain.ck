@@ -70,7 +70,7 @@ fun void fxChainBuild() {
     int choice;
 
     if ( Control.rpi ) {
-        Chooser.getInt( 1, 16 ) => choice;
+        Chooser.getInt( 1, 14 ) => choice;
     }
     else {
         Chooser.getInt( 1, 24 ) => choice;
