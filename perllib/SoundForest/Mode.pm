@@ -22,7 +22,7 @@ sub new {
 }
 
 sub initialise {
-    my $self = shift;
+    my ( $self, $reincarnation ) = @_;
     my $config = $self->get_config('conf/global.conf');
 
     # determine if we have minimum settings to kick things off
@@ -62,7 +62,11 @@ sub initialise {
     require "$req_name"; 1;
     my $obj = $mod_name->new( $config );
     $self->{mode} = $obj;
-    $self->start_osc_server;
+
+    # OSC server can't be turned off, so don't start it again
+    if ( not $reincarnation ) {
+        $self->start_osc_server;
+    }
 }
 
 sub start_osc_server {
@@ -80,7 +84,9 @@ sub reinitialise {
     my $self = shift;
 
     $self->kill_master_pid();
-    $self->initialise();
+
+    # arg denotes 'reincarnation' rather than true initialisation
+    $self->initialise( 1 );
 }
 
 sub kill_master_pid {
