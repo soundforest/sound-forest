@@ -101,7 +101,6 @@ p.pan.left =< Control.leftOut;
 p.pan.right =< Control.rightOut;
 Control.barLength::samp * 2 => now;
 
-
 Control.oscSend.startMsg("playSound", "i");
 
 1 => Control.oscSend.addInt;
@@ -131,7 +130,7 @@ fun void activity() {
 
         // still here?
         // shall we do randomly do anything to the signal?
-        if ( c.takeAction( 8 ) ) {
+        if ( c.takeAction( 1 ) ) {
             alterSignal( duration );
         }
         else {
@@ -255,18 +254,42 @@ fun void effecto( dur duration, int choice ) {
 
 fun void panBuf ( dur duration ) {
     p.pan.pan() => float oldPan;
-    Std.fabs( oldPan ) => float amount;
 
-    if ( amount > 0.3 ) {
-        <<< "PANNING", filepath, oldPan >>>;
-        1 => p.active;
-        spork ~ p.panFromFixed( c.getFloat( 0, 1 ), oldPan, "sine", duration );
-        0 => p.active;
-        oldPan => p.pan.pan;
+    // first, determine new pan position
+    float newPan, panAmountIncrement, difference;
+    dur panTimeIncrement;
+
+    duration / 4 => dur panTime;
+    panTime / 100 => panTimeIncrement;
+
+    if ( oldPan < 0 ) {
+        c.getFloat( 0, 1.0 ) => newPan;
+        ( newPan - oldPan ) => difference;
     }
     else {
-        c.getFloat( -1.0, 1.0 ) => p.pan.pan;
+        c.getFloat( -1.0, 0 ) => newPan;
+        - ( oldPan - newPan ) => difference;
     }
+
+    if ( Math.fabs( difference ) < 0.5 ) {
+        0.5 => difference;
+
+        if ( difference < 0 ) {
+            - difference => difference;
+        }
+    }
+
+    difference / 100 => panAmountIncrement;
+
+    while ( panTime > 0::second ) {
+        p.pan.pan() => float currPan;
+        currPan + panAmountIncrement => p.pan.pan;
+        // <<< oldPan, newPan, panAmountIncrement, currPan >>>;
+        panTimeIncrement => now;
+        panTimeIncrement -=> panTime;
+    }
+
+    <<< "oldPan", oldPan, "newPan", newPan, "panAmountIncrement", panAmountIncrement, "actual pan", p.pan.pan() >>>;
 
     duration => now;
 }
