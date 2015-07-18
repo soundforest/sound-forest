@@ -26,7 +26,7 @@ public class FxDownSampler extends Fx {
         else {
             while ( active ) {
                 down.decimate( getDecimation() );
-                down.bittage( c.getInt(6, 12) );
+                // down.bittage( c.getInt(6, 16) );
                 c.getInt(0, Control.bpmIntervalsShort.cap() - 1 ) => int intervalChoice;
                 Control.bpmIntervalsShort[ intervalChoice ]::second => now;
             }
