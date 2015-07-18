@@ -42,7 +42,7 @@ public class FxFlanger extends Fx {
 
         // 1 == slow
         if ( flangeType == 1 ) {
-            1 / flangeFreqsLong[ chooser.getInt( 0, flangeFreqsLong.cap() - 1 ) ] / 1 => oscFreq;
+            1 / flangeFreqsLong[ chooser.getInt( 0, flangeFreqsLong.cap() - 1 ) ] => oscFreq;
             chooser.getFloat( 1, 5 ) => baseDelay;
             chooser.getFloat( 1, baseDelay - 0.1 ) => oscAmount;
             chooser.getFloat( 0.05, 0.25 ) => volFreq;

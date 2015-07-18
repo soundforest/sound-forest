@@ -130,7 +130,7 @@ fun void activity() {
 
         // still here?
         // shall we do randomly do anything to the signal?
-        if ( c.takeAction( 1 ) ) {
+        if ( c.takeAction( 8 ) ) {
             alterSignal( duration );
         }
         else {
