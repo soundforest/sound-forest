@@ -8,6 +8,7 @@ mode=ambient
 bpm=90
 
 # Is this meant to be played on an RPI? May attempt less CPU-intensive work
+# 1 for yes, 0 for no
 rpi=0
 
 # Chuck bufsize parameter
@@ -17,4 +18,5 @@ bufsize=2048
 srate=44100
 
 # record output to wav file
+# 1 enabled recording, 0 disabled
 record=1
