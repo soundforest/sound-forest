@@ -276,10 +276,10 @@ fun void fxChainBuild() {
 //     // or reverb (ie time-smearing) attribute, we impose a delay unit.
 //     // To detect this we use a string to keep track of what's defined, and
 //     string idStrings;
-// 
+//
 //     while( i < maxConcurrentFx ) {
 //         chooser.getInt( 0, fxBattery.cap() - 1 ) => int j;
-// 
+//
 //         // need to check if effect for j is already in fxChain
 //         if ( effectNotAlreadyPresent( fxBattery[ j ] ) ) {
 //             fxBattery[ j ] @=> fxChain[ i ];
@@ -287,7 +287,7 @@ fun void fxChainBuild() {
 //             i++;
 //         }
 //     }
-// 
+//
 //     if ( ! RegEx.match( "Delay", idStrings ) && ! RegEx.match( "Reverb", idStrings ) ) {
 //         new FxDelay @=> fxBattery[ fxBattery.cap() - 1 ];
 //     }
@@ -295,15 +295,15 @@ fun void fxChainBuild() {
 //     fxChainFx();
 // }
 
-fun int effectNotAlreadyPresent( Fx fx ) {
-    for ( 0 => int j; j < maxConcurrentFx; j++ ) {
-        if ( fxChain[ j ] != NULL && fxChain[ j ].idString() == fx.idString() ) {
-            return 0;
-        }
-    }
-
-    return 1;
-}
+// fun int effectNotAlreadyPresent( Fx fx ) {
+//     for ( 0 => int j; j < maxConcurrentFx; j++ ) {
+//         if ( fxChain[ j ] != NULL && fxChain[ j ].idString() == fx.idString() ) {
+//             return 0;
+//         }
+//     }
+//
+//     return 1;
+// }
 
 fun void fxChainFx() {
     for ( 0 => int i; i < fxChain.cap(); i++ ) {
