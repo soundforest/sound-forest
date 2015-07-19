@@ -3,6 +3,7 @@ use base SoundForest::Mode;
 use strict;
 use warnings;
 use 5.10.0;
+use List::Util;
 use Data::Dump qw(dump);
 my $data = {};
 
@@ -13,6 +14,7 @@ sub new {
     $self->{config} = $config;
     $self->{play_files} = $self->get_files_list( $config->{play_sounds_path} );
     $self->{libpath} = 'lib/Modes/Ambient';
+    $self->{fxChains} = $self->build_fxchains;
 
     my $count = 0;
 
@@ -24,8 +26,10 @@ sub new {
     }
 
     if ( $config->{fx_chain_enabled} ) {
-        system( "$config->{chuck_path} + $self->{libpath}/playFxChain.ck" );
+        my $fxChain = $self->get_fxchain;
+        system( "$config->{chuck_path} + $self->{libpath}/playFxChain.ck:$fxChain" );
     }
+
     $data = $self;
     return $self;
 }
@@ -84,9 +88,35 @@ sub process_osc_notifications {
 
     if ( $message->[0] eq 'playFxChain' ) {
         print "Got playFxChain notification, regenerating\n";
-        system( qq{$self->{config}{chuck_path} + $self->{libpath}/playFxChain.ck});
+        my $fxChain = $self->get_fxchain;
+        system( qq{$self->{config}{chuck_path} + $self->{libpath}/playFxChain.ck:$fxChain});
     }
 }
 
+sub build_fxchains {
+    my $self = shift;
+    my @arr;
+
+    if ( $self->{config}{rpi} ) {
+        @arr = ( 1..24 );
+    }
+    else {
+        @arr = ( 1..14 );
+    }
+
+    @arr = List::Util::shuffle @arr;
+
+    return \@arr;
+}
+
+sub get_fxchain {
+    my $self = shift;
+
+    if ( not scalar @{ $self->{fxChains} } ) {
+        $self->{fxChains} = $self->build_fxchains;
+    }
+
+    return pop @{ $self->{fxChains} };
+}
 
 1;

@@ -24,7 +24,6 @@ Chooser chooser;
 Panner panner;
 Fader fader;
 
-Std.atoi( me.arg(0) ) => int maxConcurrentFx;
 
 Gain inputGain;
 Pan2 outputPan;
@@ -67,15 +66,16 @@ fader.fadeOutBlocking( fadeTime, outputPan );
 tearDown();
 
 fun void fxChainBuild() {
-    int choice;
+    // Ambient.pm has a master array of choices, randomly sorted
+    // so we can iterate through a full suite of fxChains without
+    // repeating (at least until we've run out of choices)
+    // Ambient.pm has the total count of fx and rpi-only fx hard-coded
+    Std.atoi( me.arg(0) ) => int choice;
 
-    if ( Control.rpi ) {
-        Chooser.getInt( 1, 14 ) => choice;
-    }
-    else {
-        Chooser.getInt( 1, 24 ) => choice;
-    }
-
+    // Define the fx chains. Originally we defined them randomly
+    // but this meant much of the time the resulting chains were
+    // suboptimal, if not nonsensical, so here we (lengthily) define
+    // some reasonable sounding chains
     if ( choice == 1 ) {
         [
             new FxFilter,
@@ -188,6 +188,7 @@ fun void fxChainBuild() {
     }
 
     // Beyond here all choices are for Control.rpi == 0 only
+    // because they feature Chugens
     if ( choice == 16 ) {
         [
             new FxDelay,
