@@ -22,9 +22,9 @@
 
 Fader fader;
 
-fader.fadeOut( 10::second, Control.leftOut );
-fader.fadeOut( 10::second, Control.rightOut );
-10::second => now;
+fader.fadeOut( 4 * Control.barLength, Control.leftOut );
+fader.fadeOut( 4 * Control.barLength, Control.rightOut );
+4 * Control.barLength => now;
 
 Control.oscSend.startMsg("fadeOutComplete", "i");
 1 => Control.oscSend.addInt;

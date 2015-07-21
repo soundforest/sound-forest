@@ -15,13 +15,12 @@ sub new {
     $self->{play_files} = $self->get_files_list( $config->{play_sounds_path} );
     $self->{libpath} = 'lib/Modes/Ambient';
     $self->{fxChains} = $self->build_fxchains;
+    $self->{playing_count} = 0;
 
     my $count = 0;
 
     while ( $count < $config->{play_sounds} ) {
-        my $filename = pop @{ $self->{play_files} };
-        print "playSound playing $filename\n";
-        system( "$config->{chuck_path} + $self->{libpath}/playSound.ck:" . '"' . $filename . '"');
+        $self->play_sound;
         $count++;
     }
 
@@ -44,7 +43,7 @@ sub process_osc_notifications {
             my $count = 0;
 
             if ( $config->{endless_play} ) {
-                print "REINITIALISING\n";
+                say "REINITIALISING\n";
                 $self->reinitialise();
             }
             else {
@@ -73,16 +72,18 @@ sub process_osc_notifications {
     # if we aren't already in a restart process or we've
     # discovered we need to kick off a restart process, carry on...
     if ( $message->[0] eq 'playSound' ) {
-        chdir $self->{config}{cwd};
+        # decrement playing count as we know file has finished playing
+        $self->{playing_count}--;
+        say 'After sound finished: ' . $self->{playing_count};
 
-        if ( ! @{ $self->{play_files} } ) {
-            $self->{ending} = 1;
-            system( qq{$config->{chuck_path} + fadeMix.ck});
+        if ( not @{ $self->{play_files} } ) {
+            if ( not $self->{playing_count} ) {
+                $self->{ending} = 1;
+                system( qq{$config->{chuck_path} + fadeMix.ck} );
+            }
         }
         else {
-            my $filename = pop @{ $self->{play_files} };
-            print "Got playSound notification, playing $filename\n";
-            system( qq{$config->{chuck_path} + $self->{libpath}/playSound.ck:"$filename"} );
+            $self->play_sound;
         }
     }
 
@@ -117,6 +118,17 @@ sub get_fxchain {
     }
 
     return pop @{ $self->{fxChains} };
+}
+
+sub play_sound {
+    my $self = shift;
+
+    chdir $self->{config}{cwd};
+    my $filename = pop @{ $self->{play_files} };
+    print "playSound playing $filename\n";
+    system( "$self->{config}{chuck_path} + $self->{libpath}/playSound.ck:" . '"' . $filename . '"');
+    $self->{playing_count}++;
+    say 'After sound play started: ' . $self->{playing_count};
 }
 
 1;

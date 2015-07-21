@@ -91,7 +91,6 @@ sub reinitialise {
 
 sub kill_master_pid {
     my $self = shift;
-    print "Reinitialising sound forest\n";
 
     my $chuck_master_pid = $self->get_chuck_master_pid();
 
