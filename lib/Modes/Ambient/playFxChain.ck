@@ -53,14 +53,16 @@ else {
 }
 
 fxChainBuild();
-[ 8, 16, 24, 32 ] @=> int bars[];
+
+// determine how long the chain will play for
+[ 16, 20, 24, 28, 32 ] @=> int bars[];
 
 bars[ chooser.getInt( 0, bars.cap() - 1 ) ] => int choice;
 
 Control.barDur * choice => dur fxTime;
 2 * Control.barDur => dur fadeTime;
 fader.fadeIn( fadeTime, 0.7, outputPan );
-fxTime - fadeTime=> now;
+fxTime - fadeTime => now;
 
 fader.fadeOutBlocking( fadeTime, outputPan );
 tearDown();
