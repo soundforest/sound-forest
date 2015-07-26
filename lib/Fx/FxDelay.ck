@@ -52,11 +52,26 @@ public class FxDelay extends Fx {
 
     fun void initialise() {
         1 => active;
+
+        // the following are 'native' choices
+        // these can be overriden if required
+        // by calling setDelay and setFeedback
         getDelayLength() => float delayLength;
 
-        chooser.getFloat( 0.4, 0.7 ) => float delayMix;
-        <<< "   FxDelay: delayLength", delayLength, "delayMix", delayMix >>>;
+        // choice of 0 means 0 feedback
+        chooser.getInt( 0, 1 ) => int mixChoice;
 
+        0 => float delayMix;
+
+        if ( mixChoice == 1 ) {
+            chooser.getFloat( 0.4, 0.6 ) => delayMix;
+        }
+
+        if ( delayLength > 1500 && mixChoice ) {
+            chooser.getFloat( 0.2, 0.9 ) => delayMix;
+        }
+
+        <<< "   FxDelay: delayLength", delayLength, "delayMix", delayMix >>>;
         delayLength::ms => delay.max;
         delayLength::ms => delay.delay;
         delayMix => feedback.gain;
@@ -70,5 +85,13 @@ public class FxDelay extends Fx {
 
         input =< delay =< output;
         delay =< feedback =< input;
+    }
+
+    fun void setDelay( dur delayAmount ) {
+        delayAmount => delay.delay;
+    }
+
+    fun void setFeedback( float feedbackAmount ) {
+        feedbackAmount => feedback.gain;
     }
 }

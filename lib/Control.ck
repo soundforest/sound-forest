@@ -109,6 +109,9 @@ Control.oscSend.setHost("localhost", 3141);
 ] @=> Control.bpmIntervalsShort;
 
 [
+    bpmInterval / 4,
+    bpmInterval / 3,
+    bpmInterval / 2,
     bpmInterval / 4 * 3, // 3 quavers
     bpmInterval,
     bpmInterval * ( 4.0 / 3.0 ),
@@ -117,7 +120,10 @@ Control.oscSend.setHost("localhost", 3141);
     bpmInterval * 2.0,
     bpmInterval * 2.5,
     bpmInterval * 3.0,
-    bpmInterval * 4.0
+    bpmInterval * 4.0,
+    bpmInterval * 5.0,
+    bpmInterval * 5.0,
+    bpmInterval * 8.0
 ] @=> Control.bpmIntervalsMedium;
 
 [
