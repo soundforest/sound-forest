@@ -30,6 +30,7 @@ Panner p;
 
 Chooser c;
 me.arg(0) => string filepath;
+me.arg(1) => string type;
 
 // set up buf
 512 => buf.chunks;
@@ -101,9 +102,9 @@ p.pan.left =< Control.leftOut;
 p.pan.right =< Control.rightOut;
 Control.barLength::samp * 2 => now;
 
-Control.oscSend.startMsg("playSound", "i");
+Control.oscSend.startMsg("playSound", "s");
 
-1 => Control.oscSend.addInt;
+type => Control.oscSend.addString;
 
 fun void activity() {
     // define convenient threshold for checking if we should bail
@@ -411,7 +412,7 @@ fun void dawdle( dur duration ) {
         c.getInt( 0, forwardRatios.cap() - 1 ) => int choice;
         forwardRatios[ choice ] => int forwardRatio;
         backwardRatios[ choice ] => int backwardRatio;
-        <<< "dawdling", forwardRatio, "forward,", backwardRatio, "back" >>>;
+
         Control.beatDur / 16 => dur dur64;
         dur64 * forwardRatio => dur forwardDur;
 
