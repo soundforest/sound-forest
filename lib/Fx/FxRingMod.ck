@@ -22,47 +22,75 @@
 
 public class FxRingMod extends Fx {
     Chooser c;
-    RingMod ring;
-    ring.setFreq( 20 );
-    float freq;
-    [ 1.0, 1.333, 1.5, 2.0, 2.666, 2.5, 3.0, 4.0, 5.0, 6.0 ] @=> float factors[];
+    SinOsc sine => Gain ring;
+    3 => ring.op; // as per http://chuck.cs.princeton.edu/doc/examples/basic/ring.ck
 
-    if ( ! Control.rpi ) {
-        input => ring => output;
-    }
-    else {
-        // do nothing
-        input => output;
-    }
+    float freq, factor;
 
+    input => ring => output;
 
     fun string idString() {
         return "FxRingMod";
     }
 
     fun void initialise() {
+        c.getFloat( 220, 550 ) => freq => sine.freq;
+
         spork ~ activity();
     }
 
     fun void activity() {
-        if ( Control.rpi ) {
-            while ( active ) {
-                1::second => now;
-            }
+        while ( active ) {
+            shiftFreq();
+            <<< "sine.freq now", sine.freq() >>>;
+            c.getInt( 4, 16 ) * Control.beatDur => now;
+        }
 
-            input =< output;
+        input =< ring =< output;
+        sine =< ring;
+    }
+
+    fun void shiftFreq() {
+        Control.beatDur * 1 => dur shiftTime;
+        sine.freq() => float oldFreq;
+        getFreq() => float newFreq;
+
+        // first, determine new shift position
+        float shiftAmountIncrement, difference;
+        dur shiftTimeIncrement;
+
+        shiftTime / 100 => shiftTimeIncrement;
+
+        if ( oldFreq < newFreq ) {
+            ( newFreq - oldFreq ) => difference;
         }
         else {
-            c.getFloat( 20, 1600 ) => float freq;
-            ring.setFreq( freq );
+            - ( oldFreq - newFreq ) => difference;
+        }
 
-            <<< "setting RingMod freq", freq >>>;
-            while ( active ) {
-                factors[ c.getInt( 0, factors.cap() - 1 ) ] => float choice;
-                choice * Control.beatDur => now;
-            }
+        difference / 100 => shiftAmountIncrement;
 
-            input =< ring =< output;
+        while ( shiftTime > 0::second ) {
+            sine.freq() => float currshift;
+            currshift + shiftAmountIncrement => sine.freq;
+            shiftTimeIncrement => now;
+            shiftTimeIncrement -=> shiftTime;
+        }
+
+        <<< "oldfreq", oldFreq, "newfreq", newFreq, "shiftAmountIncrement", shiftAmountIncrement, "actual freq", freq >>>;
+    }
+
+    fun float getFreq() {
+        [ 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 12.0 ] @=> float factors[];
+
+        c.getInt( 0, factors.cap() -1 ) => int choice;
+
+        if ( factors[ choice ] == factor ) {
+            return getFreq();
+        }
+        else {
+            factors[ choice ] => factor;
+            return factor * freq;
         }
     }
 }

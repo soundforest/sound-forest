@@ -165,7 +165,6 @@ fun void fxChainBuild() {
         ] @=> fxChain;
     }
 
-
     if ( choice == 13 ) {
         [
             new FxFilter,
@@ -177,6 +176,7 @@ fun void fxChainBuild() {
     if ( choice == 14 ) {
         [
             new FxRingMod,
+            new FxFlanger,
             new FxDelay
         ] @=> fxChain;
     }
@@ -248,7 +248,6 @@ fun void fxChainBuild() {
             new FxReverseDelay
         ] @=> fxChain;
     }
-
 
     if ( choice == 24 ) {
         [

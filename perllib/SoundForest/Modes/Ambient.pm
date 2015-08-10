@@ -131,7 +131,7 @@ sub build_fxchains {
         @arr = ( 1..24 );
     }
     else {
-        @arr = ( 1..14 );
+        @arr = ( 1..15 );
     }
 
     @arr = List::Util::shuffle @arr;
