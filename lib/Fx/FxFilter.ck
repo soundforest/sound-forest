@@ -36,19 +36,19 @@ public class FxFilter extends Fx {
 
         string filterChosen;
 
+        chooser.getFloat( 1, 5 ) => Q;
+
         if ( typeChoice == 1 ) {
             LPF lpf @=> filter;
 
             // for lpf, we want a lowish base freq
             "LPF" => filterChosen;
             chooser.getFloat( 700, 1500 ) => baseFilterFreq;
-            chooser.getFloat( 0, 5 ) => Q;
         }
 
         if ( typeChoice == 2 ) {
             HPF hpf @=> filter;
             "HPF" => filterChosen;
-            chooser.getFloat( 0, 5 ) => Q;
             chooser.getFloat( 1000, 2000 ) => baseFilterFreq;
         }
 
