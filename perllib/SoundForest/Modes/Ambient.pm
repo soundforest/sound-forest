@@ -128,10 +128,10 @@ sub build_fxchains {
     my @arr;
 
     if ( $self->{config}{rpi} ) {
-        @arr = ( 1..25 );
+        @arr = ( 1..16 );
     }
     else {
-        @arr = ( 1..16 );
+        @arr = ( 1..25 );
     }
 
     @arr = List::Util::shuffle @arr;
