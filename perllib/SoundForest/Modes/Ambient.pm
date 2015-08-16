@@ -166,6 +166,7 @@ sub play_sound {
         # if we've run out of files, try the 'main' pool
         if ( not $filename ) {
             $self->play_sound;
+            return;
         }
     }
     else {
@@ -174,6 +175,7 @@ sub play_sound {
         # if we've run out of files, try the 'alt' pool
         if ( not $filename ) {
             $self->play_sound('alt');
+            return;
         }
     }
 
