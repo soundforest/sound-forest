@@ -189,47 +189,46 @@ fun void fxChainBuild() {
         ] @=> fxChain;
     }
 
+    if ( choice == 16 ) {
+        [
+            new FxRingMod,
+            new FxHarmonicDelay,
+            new FxDelay
+        ] @=> fxChain;
+    }
+
     // Beyond here all choices are for Control.rpi == 0 only
     // because they feature Chugens
-    if ( choice == 16 ) {
+    if ( choice == 17 ) {
         [
             new FxDelay,
             new FxDownSampler
         ] @=> fxChain;
     }
 
-    if ( choice == 17 ) {
-        [
-            new FxGate,
-            new FxReverseDelay
-        ] @=> fxChain;
-    }
-
     if ( choice == 18 ) {
         [
-            new FxFlanger,
+            new FxGate,
             new FxReverseDelay
         ] @=> fxChain;
     }
 
     if ( choice == 19 ) {
         [
-            new FxDownSampler,
-            new FxDelayVariable
+            new FxFlanger,
+            new FxReverseDelay
         ] @=> fxChain;
     }
 
     if ( choice == 20 ) {
         [
-            new FxDelayVariable,
-            new FxReverseDelay
+            new FxDownSampler,
+            new FxDelayVariable
         ] @=> fxChain;
     }
 
     if ( choice == 21 ) {
         [
-            new FxFilter,
-            new FxGate,
             new FxDelayVariable,
             new FxReverseDelay
         ] @=> fxChain;
@@ -238,18 +237,27 @@ fun void fxChainBuild() {
     if ( choice == 22 ) {
         [
             new FxFilter,
+            new FxGate,
+            new FxDelayVariable,
             new FxReverseDelay
         ] @=> fxChain;
     }
 
     if ( choice == 23 ) {
         [
-            new FxGate,
+            new FxFilter,
             new FxReverseDelay
         ] @=> fxChain;
     }
 
     if ( choice == 24 ) {
+        [
+            new FxGate,
+            new FxReverseDelay
+        ] @=> fxChain;
+    }
+
+    if ( choice == 25 ) {
         [
             new FxDownSampler,
             new FxDelay,
