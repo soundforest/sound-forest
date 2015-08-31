@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------
-    Sound Forest - an ambient sound jukebox for the Raspberry Pi
+    Concrète Mixer - an ambient sound jukebox for the Raspberry Pi
 
     Copyright (c) 2014 Stuart McDonald  All rights reserved.
         https://github.com/soundforest/sound-forest
