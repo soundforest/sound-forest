@@ -1,4 +1,4 @@
-# Path to chuck binary. Defaults to location in Sound Forest package
+# Path to chuck binary. Defaults to location in Concrète Mixer package
 chuck_path=./chuck
 
 # Set mode. Default is ambient. See conf/ambient.conf for more configuration options

@@ -164,17 +164,17 @@ sub end_check {
     # resolved any time soon, so we'll have to go with outside intervention to
     # manage memory leakage
     #
-    # One of the primary goals of Sound Forest is for it to run indefinitely, so
+    # One of the primary goals of Concrète Mixer is for it to run indefinitely, so
     # we need to ensure that the memory leakage doesn't bring down the system.
     #
-    # There are three scenarios in which Sound Forest should be restarted:
+    # There are three scenarios in which Concrète Mixer should be restarted:
     # 1. The sample queue has been exhausted (as a polite housekeeping
     #   exercise, not managed here)
     # 2. The chuck process itself has used more than 50% of system memory
     # 3. More than 80% of memory has been utilised (all processed), to stop
     # chuck bringing down the system.
     #
-    # Sound Forest is intended as a single use device (ie, nothing other than
+    # Concrète Mixer is intended as a single use device (ie, nothing other than
     # system processes should be utilising resources) but it seems polite
     # nontheless to assume a limit of 50% of total resources, in the case
     # where a user decides to utilise some other software on their system - it is
