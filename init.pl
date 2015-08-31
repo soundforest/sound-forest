@@ -28,7 +28,7 @@ use warnings;
 
 $ENV{PERL5LIB} = "./perllib";
 
-use SoundForest::Mode;
+use ConcreteMixer::Mode;
 use Data::Dump qw(dump);
 
-my $mode = SoundForest::Mode->new;
+my $mode = ConcreteMixer::Mode->new;

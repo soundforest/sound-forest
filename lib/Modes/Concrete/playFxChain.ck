@@ -68,10 +68,10 @@ fader.fadeOutBlocking( fadeTime, outputPan );
 tearDown();
 
 fun void fxChainBuild() {
-    // Ambient.pm has a master array of choices, randomly sorted
+    // Concrete.pm has a master array of choices, randomly sorted
     // so we can iterate through a full suite of fxChains without
     // repeating (at least until we've run out of choices)
-    // Ambient.pm has the total count of fx and rpi-only fx hard-coded
+    // Concrete.pm has the total count of fx and rpi-only fx hard-coded
     Std.atoi( me.arg(0) ) => int choice;
 
     // Define the fx chains. Originally we defined them randomly

@@ -1,4 +1,4 @@
-# Config for 'ambient mode' (mode set in conf/global.conf).
+# Config for 'concrete mode' (mode set in conf/global.conf).
 
 # Specify the maximum number of sounds to play simultaneously
 # Note: lower the number of sounds to lessen CPU load

@@ -1,5 +1,5 @@
-package SoundForest::Mode::Ambient;
-use base SoundForest::Mode;
+package ConcreteMixer::Ambient;
+use base ConcreteMixer::Mode;
 use strict;
 use warnings;
 use 5.10.0;
@@ -30,7 +30,7 @@ sub new {
         die 'No alt files present' if not scalar $self->{play_files_alt};
     }
 
-    $self->{libpath} = 'lib/Modes/Ambient';
+    $self->{libpath} = 'lib/Modes/Concrete';
     $self->{fxChains} = $self->build_fxchains;
     $self->{playing_count} = 0;
 

@@ -1,8 +1,8 @@
 # Path to chuck binary. Defaults to location in Concrète Mixer package
 chuck_path=./chuck
 
-# Set mode. Default is ambient. See conf/ambient.conf for more configuration options
-mode=ambient
+# Set mode. Default is concrete. See conf/concrete.conf for more configuration options
+mode=concrete
 
 # Tempo (beats per minute)
 bpm=90

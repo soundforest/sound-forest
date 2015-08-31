@@ -1,4 +1,4 @@
-package SoundForest::Mode;
+package ConcreteMixer::Mode;
 
 use 5.10.0;
 use strict;
@@ -57,8 +57,8 @@ sub initialise {
 
     # as above
     sleep 1;
-    my $mod_name = "SoundForest::Mode::$mode";
-    my $req_name = "perllib/SoundForest/Modes/$mode.pm";
+    my $mod_name = "ConcreteMixer::Mode::$mode";
+    my $req_name = "perllib/ConcreteMixer/Modes/$mode.pm";
     require "$req_name"; 1;
     my $obj = $mod_name->new( $config );
     $self->{mode} = $obj;
