@@ -2,56 +2,53 @@
 
 ## About
 
-Concrète Mixer is an ambient jukebox program for the Raspberry Pi. It plays two different files simultaneously, while also feeding them through an independent effects chain. The files used and the effects used are arbitrary.
+Concrète Mixer is an ambient jukebox system. Its intent is to randomly one or more sound recordings with an a randomly assembled, frequently changing effects chain. No two renderings of a set of sounds will be the same.
 
-The intention of Concrète Mixer is to be a kind of aural kaleidoscope spinning out sounds in random combinations. The name Concrète Mixer is a metaphor whereby the app takes the user on a meandering walk through a forest of different sounds. Each walk is and therefore each perspective on the sounds is unique.
-
-If you like ambient music or field recordings are are an inveterate mystic or dreamer, Concrète Mixer should be just your sort of thing. Alternatively, if you are interested in tinkering with audio programming and the Raspberry Pi generally, Concrète Mixer can be examined and altered.
+Concrète Mixer may be run continuously on a Raspberry Pi and, when hooked up loudspeakers, will haunt any space of your choosing.
 
 ### What does it sound like?
 
 A ten minute demo may be evaluated here: https://soundcloud.com/sound-forestation/sound-forest-demo
 
-### How does it work?
-
-Once the software is installed all you copy your sample files (suitably formatted; see [Constraints](#user-content-constraints) below) to a directory called 'loops' in the audio directory of the Concrète Mixer install. You then run the program (see Installation), and sound should start playing, and continue to play until the execution is terminated.
-
 ### What's it written in?
 
-The audio processing is written in [ChucK](http://chuck.cs.princeton.edu). A [Perl](http://www.perl.org) script takes care of the execution and process spawning.
+The audio processing is written in [ChucK](http://chuck.cs.princeton.edu). A [Perl](http://www.perl.org) script (with supporting libraries) takes care of the execution and process restarts.
 
 ## Prerequisites
 
-* A Raspberry Pi. Concrète Mixer has only been tested with a Model B, but Model A *should* work, though it will run out of memory faster, and the app process will restart more often (see [Constraints](#user-content-constraints)).
-* The Pi should be running the Raspbian operating system. This is the recommended linux distribution of the Raspberry Pi Foundation, and the only one Concrète Mixer was tested with. The ChucK binary might conceivably work with another Linux distro but there's a pretty good chance it won't.
-* The Pi needs to be overclocked to 'high' setting. To do this:
-    1. In a shell on the Pi, type ``sudo raspi-config``
-    2. In the menu that displays, select option ``7 Overclock``
-    3. Select the ``High 950MHz ...`` option. Save the changes and reboot the Pi.
-
-    [Random web literature](http://www.maketecheasier.com/overclock-raspberry-pi) suggests overclocking to High setting is safe, and I've had no problems operating at this frequency, but doing this is at your own risk!
+Strictly speaking, the only prequisite is a system which supports both Perl and ChucK. In practice, the Concrete Mixer was developed in Linux (Ubuntu and Raspbian). A Raspberry Pi 2 Model B is the target device. Earlier Pi models *may* work with overclocking and configuration restraints applied.
 
 ## Installation and operation
 
-1. Visit https://github.com/soundforest/sound-forest and click the 'Download ZIP' link on the right hand side of the page. Save the zipfile to the pi user home directory (/home/pi).
-2. Unzip and untar the tarball:
-    unzip sound-forest-master.zip
-3. A folder called sound-forest-master will be created. Change to that directory:
-``$ cd sound-forest-master``
-4. Copy the sample-config file to config
-``$ cp sample-config config``
-5. At this point the software should be good to go, but you'll need some sound samples to play. The author has provided a excerpts from his own library of field recordings that can be used to test the program. [Download the libray](https://archive.org/download/sound-forest-library/sound-forest-library.zip) and unzip the files into a directory called audio/loops in the sound-forest directory (you can specify a different path in the the ``config`` file. Ultimately you'll want to use your own files, or least augment the demo librarby with many more. Ideally you should have hundreds of files available, allowing for a lot of possible combinations of sounds.
-6. Now it's time to run the app. Before you can do this you need to set an environment variable in the shell. Run the following command:
+1. The first thing you'll need is a set of sound files you want the software to mix. If you don't happen to have a collection of sound files you want to play, your best bet for this is to download files from [SoundCloud](http://soundcloud.com) or [FreeSound](https://freesound.org). From experience sound files from about 90 seconds to two and a half minutes seem to work best, but it depends on the dynamics of the recording.
+
+2. Visit https://github.com/concrete-mixer/concrete-mixer and click the 'Download ZIP' link on the right hand side of the page.
+3. Unzip the code:
+``$ unzip concrete-mixer-master.zip``
+4. In the conf/ directory in the root concrete-mixer directory set up the configuration files from their templates:
+``$ cp conf/global.conf.sample conf/global.conf``
+``$ cp conf/concrete.conf.sample conf/concrete.conf``
+
+5. Edit conf/concrete.conf and specify a directory location for your sounds:
+``play_sounds_main_path=<insert your dir here>``
+Note that you can also supply a second directory (the play_sounds_alt_path) for sounds that you don't want to be played against each other; instead these sounds will be mixed with the 'main' sounds.
+concrete.conf provides several other configuration options for tuning the app.
+
+6. It's nearly time to start the app. Before you can do so, however, you need to make a Perl environment setting:
 ``$ export PERL5LIB=.:perllib``
-    (This command lets Perl know where the library files used by the app reside.)
-7. Finally, you should be able to run ``perl init.pl`` and Concrète Mixer will start running.
+To make this permanent, run:
+``$ echo export PERL5LIB=.:perllib >> ~/.bashrc``
+(This assumes that you're using bash as your shell.)
 
-### Making Concrète Mixer run automatically
+7. Run the app typing the following from your app's directory:
+``./init.pl``
 
-The intention of Concrète Mixer is to turn the Pi into a single-purpose sound generating box that can be plugged in to speakers and left to run without any supervision indefinitely. You don't have to do this, but if you'd like to, here's what you do:
+### Making a Raspberry Pi a concrète mixing machine
+
+The intention of Concrète Mixer is to turn a Pi into a single-purpose sound that may be left to run without any supervision indefinitely (speakers not included). You don't have to do this, but if you'd like to, here's what you do:
 
 1. Edit ``/etc/inittab`` using your favorite editor (here assuming nano):
-    ``sudo nano /etc/inittab``.(Ultimately you'll want to use your own files.)
+    ``sudo nano /etc/inittab``. (Ultimately you'll want to use your own files.)
     Enter your password if required.
 2. Search for the line ``1:2345:respawn:/sbin/getty 115200 tty1`` and comment it out by adding a ``#`` character at the start of line.
 3. Add the following code beneath the commented out line:
@@ -63,66 +60,31 @@ The intention of Concrète Mixer is to turn the Pi into a single-purpose sound g
 2. Edit the /home/pi/.bashrc file to get the pi to run Concrète Mixer: ``nano /home/pi/.bashrc``.
 
 3. At the bottom of the file, add the following lines:
-
     <code>
-        export PERL5LIB=/home/pi/sound-forest/perllib
+        export PERL5LIB=<insert your path to concrete mixer dir here>/perllib
 
         if [ $(tty) == /dev/tty1 ]; then
             cd ~/sound-forest
             perl init.pl
         fi
     </code>
-
-    The first line sets the $PERL5LIB environment variable automatically. The subsequent lines invoke Concrète Mixer if the current terminal is tty1 only. This means you can run the program in one terminal and can perform other tasks in other terminals.
+The first line sets the $PERL5LIB environment variable automatically (mentioned above). The subsequent lines invoke Concrète Mixer if the current terminal is tty1 only. This means you can run the program in one terminal and can perform other tasks in other terminals.
 
 ## General discussion
 
 ### Constraints
 
-The Raspberry Pi's processor is not powerful; the Pi is the platform of choice for Concrète Mixer chiefly for its ubiquity and its modest price. ChucK is not the most performance-optimised language either. In short, compromises have had to be made to get as much possible out of Concrète Mixer:
-    * ChucK's playback rate is constrained to 32Khz to save on CPU. Younger ears may note a loss of crispness at the very high end, but depending on the ambient noise levels of the setting this deficit in herzage may not be noticeable.
-* To save on redundant processing, samples should be formatted mono 32Khz 16 bit. The app has been tested with PCM wav only, but AIF should also be supported.
-* Mix the samples' levels to be generally consistent. This can be batch processed in lnux though there may be a difference between volume calculated by a computer and volume as perceived by the human ear. The demo samples were mixed with peaks around -6db to guarantee some headroom where FX chain might cause a frequency band to 'wig out'.
-* Samples should not be more than about five minutes in length. There's two reasons for this:
-    1. Concrète Mixer is constrained to use up to half of the available RAM only. After this ceiling is reached, the app is restarted. If large sound files are used, the greater the likelihood that the RAM limit will be reached - especially on a Model A pi, since the amount of RAM to play will be 128MB. In practice two 5 minute files comes to about 100MB, and if you factor in memory leakage it won't be long until the app gets restarted.
-    2. Unless a recording has a lot of variety, short files featuring specific sound 'events' are better than long files, because short files increase variety across playback, whereas a longer file will need to more interesting to avoid blending into the listener's aural background. Some files may be able to do that, but you'll probably find that few files need to be longer than 3 minutes.
-* The Pi's sound card is rather poor quality, providing the equivalent of 11 bit playback, with a pretty high noise ceiling. Depending on the quality of the source samples, this may be acceptable (or at least make little difference), but if you want to use something better you can connect a USB sound card or play Concrète Mixer through the Pi's HDMI output. Note that Concrète Mixer hasn't been tested with a USB sound card, and using one may increase system load and adversely affect playback.
-* The Pi needs to be overclocked. (See [Installation](#user-content-installation).)
-* The chuck binary distributed with Concrète Mixer was compiled against the September 2013 version of Raspbian. It has been tested against the January 2014 edition of Raspbian and still works.
-
-### Aesthetics
-
-The main goal of Concrète Mixer is to load the mix with as much variation as possible (in terms of the number of samples and the configuration of effects) that there will be as much freedom to surprise listeners with the resulting combinations of sound.
-
-Because the choices made are random, and the app is blind to the characteristics of the sample being loaded, often the configuration chosen may not suit the sample. This may irritate listeners who are used to a more sensitive, conscious treatment of a sound in ambient music compositions.
-
-This is a big problem, but when a sound combination does work out well, the result is *even more satisfying for knowing that it mightn't have been*. This aesthetic strategy may not appeal to everyone, but I think maximising the app's freedom by giving it as many possibilities as possible has been the way to go.
-
-### Customising and extending Concrète Mixer
-
-#### Customising
-
-Concrète Mixer has a config file (called config) which includes a handful of settings. The file is annotated with comments, so have a read and see what you can alter. Note that you'll need to restart any existing Concrète Mixer process for changes to take effect.
-
-#### Extending
-
-Concrète Mixer is a series of simple scripts written in ChucK. If you're interested in electronic music programming it is relatively easy to learn ChucK and modify the Concrète Mixer scripts. Concrète Mixer itself is a very basic ChucK program, in terms of sound processing, but it does provide a reasonable trip around the language.
-
-One quite straight forward extension of the app would be to use very short loops of sound (no more than two seconds). Using two or more loops concurrently will give the playback a very hypnotic feel. If you wanted to be even cleverer and carefully sync the sample lengths, you could create rhythm tracks. It would not be hard to think of a million tools better suited to beat production than Concrète Mixer, but if you want to try something different, it shouldn't be too hard.
+* You should mix the samples' levels to be generally consistent so that any one sample should not be disproportionately louder than any other. This can be time-consuming process. The author has found the normalize-audio utility in linux to be useful for shunting sounds up or down by 3-6dB
+* The Pi's analogue audio output is terrible; if possible use an HDMI audio splitter (preferably powered). A separate USB sound card may also be helpful.
+* The chuck binary distributed with Concrète Mixer was compiled against the September 2013 version of Raspbian.
 
 #### Running Concrète Mixer on other devices
 
-ChucK can be run in Windows, Linux, and OSX environments, and in principle (and with a Perl interpreter) Concrète Mixer can be operated in those environments too. Concrète Mixer was originally coded on a laptop running Ubuntu Linux, for example.
+You should be able to run Concrète Mixer on OSX without much trouble; on Windows things will be much trickier.
 * [Information on how to install ChucK on various platforms](http://chuck.cs.princeton.edu/release)
 * [Information on how to install Perl on various platforms](http://www.perl.org/get.html)
 
-Note that on other platforms the chuck executable included with Concrète Mixer will not work as it has been compiled for the Pi (and Raspbian). To use Concrète Mixer on other platforms you'll need to change the config file to point to a different ChucK executable (read the config file for more details).
-
-If you do wish to use Concrète Mixer on other systems it's likely you'll be using a device with greater processing power than the Paspberry Pi, and you may wish to change the playback settings in the ``config`` file to 44Khz (assuming 44Khz samples), and play more than two samples concurrently. You can also alter the program to to use stereo audio rather than mono for each stream, though this involves more work than merely altering the config file.
-
-## Future development
-
-Very broadly the project is complete, barring any bugs that sneak through at release time. If Concrète Mixer gets support through actual usage there's a lot more than could be done to extend the program, especially around the effects chain.
+Note that on other platforms the chuck executable included with Concrète Mixer will not work as it has been compiled for the Pi (and Raspbian). To use Concrète Mixer on other platforms you'll need to change the conf/global.conf file to point to a different ChucK executable (read the config file for more details).
 
 ## Licence
 
