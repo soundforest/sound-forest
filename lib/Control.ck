@@ -2,7 +2,7 @@
     Concrète Mixer - an ambient sound jukebox for the Raspberry Pi
 
     Copyright (c) 2014 Stuart McDonald  All rights reserved.
-        https://github.com/soundforest/sound-forest
+        https://github.com/concrete-mixer/concrete-mixer
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ Std.atoi( me.arg(3) ) => Control.rpi;
 WvOut2 wv;
 
 if ( Control.record ) {
-    "sound-forest-output" => wv.autoPrefix;
+    "concrete-mixer-output" => wv.autoPrefix;
 
     // this is the output file name
     "special:auto" => wv.wavFilename;

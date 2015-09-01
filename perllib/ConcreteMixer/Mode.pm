@@ -1,7 +1,7 @@
 #    Concrète Mixer - an ambient sound jukebox for the Raspberry Pi
 #
 #    Copyright (c) 2014 Stuart McDonald  All rights reserved.
-#        https://github.com/soundforest/sound-forest
+#        https://github.com/concrete-mixer/concrete-mixer
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -173,7 +173,7 @@ sub end_check {
     my $stat = $lxsp->get;
     my $chuck_resident_mem_used = $stat->{ $chuck_master_pid }{resident};
 
-    # sound forest leaks memory. The code has been rationalised somewhat,
+    # The app leaks memory. The code has been rationalised somewhat,
     # but leakage seems to be increasing at a rate of about 1MB per playSound
     # and playFxChain cycle. I'm not sure why this is happening, but I'm guessing
     # the persistent use of the sound bus in the Control class is the source.
@@ -204,13 +204,13 @@ sub end_check {
 
     # Scenario no.2
     if ( $memtotal / 2 < $chuck_resident_mem_used ) {
-        print "ending sound forest (free memory below 20%)\n";
+        print "ending Concrète Mixer (free memory below 20%)\n";
         return 1;
     }
 
     # Scenario no. 3
     if ( $realfree * 5 < $memtotal ) {
-        print "ending sound forest (chuck process using more than 50% system memory)\n";
+        print "ending Concrète Mixer (chuck process using more than 50% system memory)\n";
         return 1;
     }
 

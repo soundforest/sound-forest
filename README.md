@@ -8,7 +8,7 @@ Concrète Mixer may be run continuously on a Raspberry Pi and, when hooked up lo
 
 ### What does it sound like?
 
-A ten minute demo may be evaluated here: https://soundcloud.com/sound-forestation/sound-forest-demo
+A ten minute demo may be evaluated here: https://soundcloud.com/concrete-mixer/concrete-mixer-demo
 
 ### What's it written in?
 
@@ -64,7 +64,7 @@ The intention of Concrète Mixer is to turn a Pi into a single-purpose sound tha
         export PERL5LIB=<insert your path to concrete mixer dir here>/perllib
 
         if [ $(tty) == /dev/tty1 ]; then
-            cd ~/sound-forest
+            cd ~/concrete-mixer
             perl init.pl
         fi
     </code>
@@ -97,4 +97,4 @@ This code is distributed under the GPL v2. See the COPYING file for more details
 * Jonny Schulz, who authored the [Sys::Statistics::Linux](http://search.cpan.org/~bloonix/Sys-Statistics-Linux/lib/Sys/Statistics/Linux.pm) Perl module
 
 ## Contact
-* <soundforestation@gmail.com>
+* <concrete-mixer-audio@gmail.com>

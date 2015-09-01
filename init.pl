@@ -4,7 +4,7 @@
 #    Concrète Mixer - an ambient sound jukebox for the Raspberry Pi
 #
 #    Copyright (c) 2014 Stuart McDonald  All rights reserved.
-#        https://github.com/soundforest/sound-forest
+#        https://github.com/concrete-mixer/concrete-mixer
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
