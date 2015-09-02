@@ -64,7 +64,7 @@ sub initialise {
 
     # first initialise chuck environment
     my $bufsize = $config->{bufsize} || 4096;
-    my $srate = $config->{srate} || 32000;
+    my $srate = $config->{srate} || 44100;
 
     # kick off chuck loop vm
     my $pid = system( qq{$config->{chuck_path} --loop --srate$srate --bufsize$bufsize &} );
@@ -73,12 +73,14 @@ sub initialise {
     sleep 1;
     my $mode = ucfirst( $config->{mode} );
 
+    my $chuck_string = qq{ $config->{chuck_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate":"$config->{record}":"$config->{rpi}" };
+    # say $chuck_string;
     system( qq{ $config->{chuck_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate":"$config->{record}":"$config->{rpi}" });
 
     # as above
     sleep 1;
-    my $mod_name = "ConcreteMixer::Mode::$mode";
-    my $req_name = "perllib/ConcreteMixer/Modes/$mode.pm";
+    my $mod_name = "ConcreteMixer::$mode";
+    my $req_name = "perllib/ConcreteMixer/$mode.pm";
     require "$req_name"; 1;
     my $obj = $mod_name->new( $config );
     $self->{mode} = $obj;
@@ -134,7 +136,7 @@ sub get_config {
     my ( $self, $path ) = @_;
     my $config = {};
 
-    open( my $fh, $path ) or die "Cannot open config file";
+    open( my $fh, $path ) or die "Cannot open config file $path";
     my @config_rows = <$fh>;
 
     foreach my $row ( @config_rows ) {

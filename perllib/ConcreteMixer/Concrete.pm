@@ -18,7 +18,7 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 #    U.S.A.
 
-package ConcreteMixer::Ambient;
+package ConcreteMixer::Concrete;
 use base ConcreteMixer::Mode;
 use strict;
 use warnings;
@@ -34,20 +34,21 @@ sub new {
     $self->{config} = $config;
 
     # do a bit of dying if config is nonsensical
-    die "play_sounds value not specified" if not $config->{play_sounds};
-    die "play_sounds_main_path not specified" if not $config->{play_sounds_main_path};
+    die "concurrent_sounds value not specified" if not $config->{concurrent_sounds};
+    die "audio_main_path not specified" if not $config->{audio_main_path};
 
-    if ( $config->{play_sounds_alt_path} and $config->{play_sounds} == 1 ) {
-        $config->{play_sounds} = 2;
-        say "Setting play_sounds to 2 as play_sounds_alt_path specified";
+    if ( $config->{audio_alt_path} and $config->{concurrent_sounds} == 1 ) {
+        $config->{concurrent_sounds} = 2;
+        say "Setting concurrent_sounds to 2 as audio_alt_path specified";
     }
 
-    $self->{play_files_main} = $self->get_files_list( $config->{play_sounds_main_path} );
-    die 'No main files present' if not scalar $self->{play_files_main};
+    $self->{play_files_main} = $self->get_files_list( $config->{audio_main_path} );
 
-    if ( $config->{play_sounds_alt_path} ) {
-        $self->{play_files_alt} = $self->get_files_list( $config->{play_sounds_alt_path} );
-        die 'No alt files present' if not scalar $self->{play_files_alt};
+    die 'No main files present' if not scalar @{ $self->{play_files_main} };
+
+    if ( $config->{audio_alt_path} ) {
+        $self->{play_files_alt} = $self->get_files_list( $config->{audio_alt_path} );
+        die 'No alt files present' if not scalar @{ $self->{play_files_alt} };
     }
 
     $self->{libpath} = 'lib/Modes/Concrete';
@@ -56,10 +57,10 @@ sub new {
 
     my $count = 0;
 
-    while ( $count < $config->{play_sounds} ) {
+    while ( $count < $config->{concurrent_sounds} ) {
         $count++;
 
-        if ( $self->{play_files_alt} and $count == $config->{play_sounds} ) {
+        if ( $self->{play_files_alt} and $count == $config->{concurrent_sounds} ) {
             $self->play_sound( 'alt' );
             next;
         }

@@ -30,8 +30,8 @@ Strictly speaking, the only prequisite is a system which supports both Perl and 
 ``$ cp conf/concrete.conf.sample conf/concrete.conf``
 
 5. Edit conf/concrete.conf and specify a directory location for your sounds:
-``play_sounds_main_path=<insert your dir here>``
-Note that you can also supply a second directory (the play_sounds_alt_path) for sounds that you don't want to be played against each other; instead these sounds will be mixed with the 'main' sounds.
+``concurrent_sounds_main_path=<insert your dir here>``
+Note that you can also supply a second directory (the concurrent_sounds_alt_path) for sounds that you don't want to be played against each other; instead these sounds will be mixed with the 'main' sounds.
 concrete.conf provides several other configuration options for tuning the app.
 
 6. It's nearly time to start the app. Before you can do so, however, you need to make a Perl environment setting:
