@@ -31,6 +31,7 @@ public class Control {
     static Gain @ fxIn;
     static int sampleActive[];
     static float bpm;
+    static float bpmInterval;
     static float bpmIntervalsShort[];
     static float bpmIntervalsMedium[];
     static float bpmIntervalsLong[];
@@ -93,6 +94,7 @@ new OscSend @=> Control.oscSend;
 Control.oscSend.setHost("localhost", 3141);
 
 ( 60 / Control.bpm ) => float bpmInterval;
+bpmInterval => Control.bpmInterval;
 
 [
      bpmInterval / 8,
