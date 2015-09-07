@@ -144,10 +144,22 @@ sub end {
     }
 }
 
+=head2 build_fxchains
+
+Builds an random array of fx ids for use by playFx.ck. Once
+the array is emptied of fx patches it gets rebuilt.
+
+The point of doing it like this that we don't reuse an fxchain
+until we've used all the others, meaning less repetition overall.
+
+=cut
 sub build_fxchains {
     my $self = shift;
     my @arr;
 
+    # there are some fx we don't want rpis to use as they use chugens.
+    # It's unfortunate we have to hardcode things here but then the
+    # whole business of using Perl to bootstrap Chuck is unfortunate.
     if ( $self->{config}{rpi} ) {
         @arr = ( 1..16 );
     }
