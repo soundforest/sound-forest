@@ -36,6 +36,7 @@ me.arg(1) => string type;
 512 => buf.chunks;
 filepath => buf.read;
 
+// set up buf2 (may not be used if file is not stereo)
 SndBuf buf2;
 
 if ( buf.channels() == 1 ) {
@@ -50,6 +51,7 @@ if ( buf.channels() == 1 ) {
     c.getFloat( -1.0, 1.0 ) => p.pan.pan;
 }
 else {
+    512 => buf2.chunks;
     filepath => buf2.read;
     1 => buf2.channel;
 
@@ -62,6 +64,7 @@ else {
         buf2 => Control.leftOut;
         buf => Control.rightOut;
     }
+
     buf => Control.fxIn;
     buf2 => Control.fxIn;
 }
