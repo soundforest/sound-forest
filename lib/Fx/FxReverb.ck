@@ -21,17 +21,32 @@
 -----------------------------------------------------------------------------*/
 
 public class FxReverb extends Fx {
-    UGen rev;
+    GVerb gverb;
+    JCRev jcrev;
 
     if ( Control.rpi ) {
-        new JCRev @=> rev;
+        input => jcrev => output;
     }
     else {
+        input => gverb => output;
         // Use something gruntier if pi not being used
-        new NRev @=> rev;
-    }
 
-    input => rev => output;
+        // for reference, the following are GVerb defaults:
+        //      const float maxroomsize = 300.0f;
+        //      float roomsize = 30.0f;
+        //      float revtime = 5.0f;
+        //      float damping = 0.8f;
+        //      float spread = 15.0f;
+        //      float inputbandwidth = 0.5f;
+        //      float drylevel = 0.6f; //-1.9832f;
+        //      float earlylevel = 0.4f; //-1.9832f;
+        //      float taillevel = 0.5f;
+
+        // TODO: randomize somewhat
+        10::second => gverb.revtime;
+        50.0 => gverb.roomsize;
+        0.4 => gverb.damping;
+    }
 
     fun string idString() { return "FxReverb"; }
 }

@@ -1,6 +1,9 @@
 # Path to chuck binary. Defaults to location in Concrète Mixer package
 chuck_path=./chuck
 
+# Path to chuck chugin plugins - we have our own dir containing just GVerb
+chugin_path=lib/chugins
+
 # Set mode. Default is concrete. See conf/concrete.conf for more configuration options
 mode=concrete
 

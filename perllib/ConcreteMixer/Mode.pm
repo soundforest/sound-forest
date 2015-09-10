@@ -73,9 +73,9 @@ sub initialise {
     sleep 1;
     my $mode = ucfirst( $config->{mode} );
 
-    my $chuck_string = qq{ $config->{chuck_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate":"$config->{record}":"$config->{rpi}" };
+    my $chuck_string = qq{ $config->{chuck_path} --chugin-path:$config->{chugin_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate":"$config->{record}":"$config->{rpi}" };
     # say $chuck_string;
-    system( qq{ $config->{chuck_path} + lib/Modes/$mode/$mode.ck:"$config->{bpm}":"$srate":"$config->{record}":"$config->{rpi}" });
+    system( $chuck_string );
 
     # as above
     sleep 1;
