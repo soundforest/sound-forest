@@ -20,45 +20,63 @@
     U.S.A.
 -----------------------------------------------------------------------------*/
 
-
+// This class used to use a chugen which copied bitcrusher
+// After getting chugins to (finally) work, we now use actual bitcrusher
 public class FxDownSampler extends Fx {
     Chooser c;
-    DownSampler down;
+    Bitcrusher bc;
+    int oldBittage;
+    int oldDecimation;
 
     fun string idString() { return "FxDownSampler"; }
 
     fun void initialise() {
-        if ( Control.rpi ) {
-            input => output;
-        }
-        else {
-            input => down => Gain g => output;
-            0.7 => g.gain;
-        }
+        input => bc => output;
 
         spork ~ activity();
     }
 
 
     fun void activity() {
-        if ( Control.rpi ) {
-            while ( active ) {
-                1::second => now;
-            }
+        while ( active ) {
+            getDecimation() => int decimation;
+            decimation => bc.downsampleFactor;
+            getBits() => int bits;
+            bits => bc.bits;
+
+            c.getInt(0, Control.bpmIntervalsShort.cap() - 1 ) => int intervalChoice;
+            Control.bpmIntervalsShort[ intervalChoice ]::second => now;
         }
-        else {
-            while ( active ) {
-                down.decimate( getDecimation() );
-                // down.bittage( c.getInt(6, 16) );
-                c.getInt(0, Control.bpmIntervalsShort.cap() - 1 ) => int intervalChoice;
-                Control.bpmIntervalsShort[ intervalChoice ]::second => now;
-            }
-        }
+
+        input =< bc =< output;
     }
 
     fun int getDecimation() {
-        [ 1, 2, 3, 4, 6, 8, 12, 16, 24, 32 ] @=> int options[];
+        [ 1, 2, 3, 4, 6, 8, 12, 16, 24 ] @=> int options[];
 
-        return options[ c.getInt( 0, options.cap() - 1 ) ];
+        options[ c.getInt( 0, options.cap() - 1 ) ] => int decimation;
+
+        if ( decimation == oldDecimation ) {
+            return getDecimation();
+        }
+        else {
+            decimation => oldDecimation;
+            return decimation;
+        }
+    }
+
+    fun int getBits() {
+        [ 7, 8, 9, 10, 11, 12 ] @=> int options[];
+
+        options[ c.getInt( 0, options.cap() - 1 ) ] => int bittage;
+
+        // ensure we always return something different from the old one
+        if ( bittage == oldBittage ) {
+            return getBits();
+        }
+        else {
+            bittage => oldBittage;
+            return bittage;
+        }
     }
 }

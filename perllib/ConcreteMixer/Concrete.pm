@@ -161,7 +161,7 @@ sub build_fxchains {
     # It's unfortunate we have to hardcode things here but then the
     # whole business of using Perl to bootstrap Chuck is unfortunate.
     if ( $self->{config}{rpi} ) {
-        @arr = ( 1..16 );
+        @arr = ( 1..19 );
     }
     else {
         @arr = ( 1..25 );
