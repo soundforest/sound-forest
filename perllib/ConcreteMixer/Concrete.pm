@@ -84,6 +84,11 @@ sub process_osc_notifications {
     my ( $sender, $message ) = @_;
     my $self = $data;
 
+    dump ({
+        sounds_left => $self->sounds_left,
+        playing_count => $self->{playing_count},
+    });
+
     # first consider if we should serve the request or if there's
     # * a memory usage issue requiring process to end
     # * no more sounds to play and the last sound has finished playing
@@ -94,7 +99,7 @@ sub process_osc_notifications {
     ) {
         # don't do whatever you were going to do, fade out and either
         # end or reinitialise program
-        $self->end;
+        $self->fade_mix;
     }
 
     # if we aren't already in a restart process or we've
@@ -108,12 +113,19 @@ sub process_osc_notifications {
         if ( $self->sounds_left ) {
             $self->play_sound( $type );
         }
+        else {
+            $self->fade_mix;
+        }
     }
 
     if ( $message->[0] eq 'playFxChain' ) {
         print "Got playFxChain notification, regenerating\n";
         my $fxChain = $self->get_fxchain;
         system( qq{$self->{config}{chuck_path} + $self->{libpath}/playFxChain.ck:$fxChain});
+    }
+
+    if ( $message->[0] eq 'fadeOutComplete' ) {
+        $self->end;
     }
 }
 
@@ -142,6 +154,18 @@ sub end {
         say "EXITING";
         exit;
     }
+}
+
+=head2
+
+playFx isn't playSound-aware, so when we run out of sounds we need to shut down the app manually.
+
+This function invokes fadeMix, which zeroes the playback volume, and reports back via OSC, at which point we shut down or restart chuck.
+
+=cut
+sub fade_mix {
+    my ( $self ) = @_;
+    system( qq{$self->{config}{chuck_path} + $self->{libpath}/fadeMix.ck});
 }
 
 =head2 build_fxchains
