@@ -402,9 +402,11 @@ fun void xeno( dur durdur ) {
 }
 
 // Make playback run slower by oscillating back and forth
+// This didn't sound as interesting as you'd think, esp
+// with environmental sounds where the action is often spaced out
+// so I've made it a bit more interesting by randomly changing the
+// pitch. As you do.
 fun void dawdle( dur duration ) {
-    1 => float direction;
-
     [ 2, 3, 4, 5, 5, 7, 9, 10 ] @=> int forwardRatios[];
     [ 1, 1, 1, 1, 2, 2, 2, 3  ] @=> int backwardRatios[];
 
@@ -427,10 +429,17 @@ fun void dawdle( dur duration ) {
 
         f.fadeIn( fadeDur, origGain, buf );
 
+        if ( c.getInt( 0, 1 ) ) {
+            [ 0.8, 1.2, 1.5 ] @=> float pitches[];
+
+            pitches[ c.getInt(0, pitches.cap() -1 ) ] => buf.rate;
+        }
+
         forwardDur - fadeDur => now;
         f.fadeOutBlocking( fadeDur, buf );
         buf.pos() - backwardSamples => buf.pos;
         forwardDur -=> duration;
+        1.0 => buf.rate;
     }
 
     f.fadeInBlocking( fadeDur, origGain, buf );
