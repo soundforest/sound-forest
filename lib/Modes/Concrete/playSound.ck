@@ -186,12 +186,13 @@ fun void alterSignal( dur duration ) {
 }
 
 // Generate choice integer for action
+// Only chugen now in operation here is reverseDelay
 fun int getAction( int startInt ) {
     // size of choices limited by config rpi setting
     13 => int endInt;
 
     if ( Control.rpi ) {
-        10 => endInt;
+        12 => endInt;
     }
 
     c.getInt( startInt, endInt ) => int choice;
@@ -218,17 +219,17 @@ fun void effecto( dur duration, int choice ) {
         new FxDelay @=> effect;
     }
 
-    // the following not invoked if Control.rpi
     if ( choice == 11 ) {
-        new FxReverseDelay @=> effect;
-    }
-
-    if ( choice == 12 ) {
         new FxDownSampler @=> effect;
     }
 
-    if ( choice == 13 ) {
+    if ( choice == 12 ) {
         new FxRingMod @=> effect;
+    }
+
+    // the following not invoked if Control.rpi
+    if ( choice == 13 ) {
+        new FxReverseDelay @=> effect;
     }
 
     <<< "EFFECTING", filepath, effect.idString() >>>;
