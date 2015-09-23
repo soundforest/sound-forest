@@ -84,11 +84,6 @@ sub process_osc_notifications {
     my ( $sender, $message ) = @_;
     my $self = $data;
 
-    dump ({
-        sounds_left => $self->sounds_left,
-        playing_count => $self->{playing_count},
-    });
-
     # first consider if we should serve the request or if there's
     # * a memory usage issue requiring process to end
     # * no more sounds to play and the last sound has finished playing
@@ -210,7 +205,7 @@ sub play_sound {
     my ( $self, $type) = @_;
 
     $type //= 'main';
-    say $type;
+
     chdir $self->{config}{cwd};
     my $filename;
 
